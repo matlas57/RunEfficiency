@@ -8,11 +8,12 @@
 import SwiftUI
 
 struct RunDetailView: View {
+    var run: Run
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        Text(run.name)
     }
 }
 
 #Preview {
-    RunDetailView()
+    RunDetailView(run: MockData.sampleRuns[0])
 }

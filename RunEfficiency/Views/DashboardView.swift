@@ -8,8 +8,18 @@
 import SwiftUI
 
 struct DashboardView: View {
+    @StateObject private var viewModel = DashboardViewModel()
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 24) {
+                    TrendView(points: viewModel.points)
+                    RunsListView(runs: viewModel.runs)
+                }
+                .padding()
+            }
+            .navigationTitle("Dashboard")
+        }
     }
 }
 

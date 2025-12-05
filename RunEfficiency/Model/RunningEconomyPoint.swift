@@ -6,3 +6,9 @@
 //
 
 import Foundation
+
+struct RunningEconomyPoint: Hashable, Identifiable {
+    var id = UUID()
+    var date: Date
+    var efficiencyScore: Double
+}

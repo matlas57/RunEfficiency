@@ -8,11 +8,32 @@
 import SwiftUI
 
 struct RunRowView: View {
+    var run: Run
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        HStack {
+            VStack(alignment: .leading) {
+                Text(run.name)
+                    .font(.headline)
+                Text(run.dateString)
+            }
+            Spacer()
+            HStack(spacing: 8) {
+                Text(run.distanceString)
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(.secondary)
+            }
+            
+        }
+        .padding()
+        .background(.secondary.opacity(0.1))
+        .cornerRadius(12)
     }
 }
 
 #Preview {
-    RunRowView()
+    RunRowView(run: MockData.sampleRuns[0])
 }

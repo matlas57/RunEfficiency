@@ -8,11 +8,25 @@
 import SwiftUI
 
 struct RunsListView: View {
+    var runs: [Run]
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        VStack {
+            Text("Recent Runs")
+                .font(.headline)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            ForEach(runs) { run in
+                NavigationLink {
+                    RunDetailView(run: run)
+                } label : {
+                    RunRowView(run: run)
+                }
+                .buttonStyle(.plain)
+            }
+        }
     }
 }
 
 #Preview {
-    RunsListView()
+    RunsListView(runs: MockData.sampleRuns)
 }
