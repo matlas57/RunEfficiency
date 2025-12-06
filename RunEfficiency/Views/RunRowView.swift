@@ -9,16 +9,17 @@ import SwiftUI
 
 struct RunRowView: View {
     var run: Run
+    var userProfile: UserProfile
     var body: some View {
         HStack {
             VStack(alignment: .leading) {
                 Text(run.name)
                     .font(.headline)
-                Text(run.dateString)
+                Text(RunFormatter.shared.dateString(for: run.date))
             }
             Spacer()
             HStack(spacing: 8) {
-                Text(run.distanceString)
+                Text(RunFormatter.shared.distanceString(for: run, units: userProfile.unitPrefernce))
                     .font(.headline)
                     .fontWeight(.semibold)
                 
@@ -35,5 +36,5 @@ struct RunRowView: View {
 }
 
 #Preview {
-    RunRowView(run: MockData.sampleRuns[0])
+    RunRowView(run: MockData.sampleRuns[0], userProfile: MockData.sampleUserProfile)
 }

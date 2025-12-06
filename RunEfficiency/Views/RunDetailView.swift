@@ -10,7 +10,8 @@ import SwiftUI
 struct RunDetailView: View {
     var run: Run
     var body: some View {
-        Text(run.name)
+        Text(String(run.name))
+        Spacer()
     }
 }
 

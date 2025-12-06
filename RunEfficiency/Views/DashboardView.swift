@@ -14,7 +14,7 @@ struct DashboardView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
                     TrendView(points: viewModel.points)
-                    RunsListView(runs: viewModel.runs)
+                    RunsListView(runs: viewModel.runs, userProfile: viewModel.userProfile)
                 }
                 .padding()
             }

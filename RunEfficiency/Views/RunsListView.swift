@@ -9,6 +9,7 @@ import SwiftUI
 
 struct RunsListView: View {
     var runs: [Run]
+    var userProfile: UserProfile
     
     var body: some View {
         VStack {
@@ -19,7 +20,7 @@ struct RunsListView: View {
                 NavigationLink {
                     RunDetailView(run: run)
                 } label : {
-                    RunRowView(run: run)
+                    RunRowView(run: run, userProfile: userProfile)
                 }
                 .buttonStyle(.plain)
             }
@@ -28,5 +29,5 @@ struct RunsListView: View {
 }
 
 #Preview {
-    RunsListView(runs: MockData.sampleRuns)
+    RunsListView(runs: MockData.sampleRuns, userProfile: MockData.sampleUserProfile)
 }
