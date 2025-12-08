@@ -37,5 +37,4 @@ struct MockData {
         )
     ]
     
-    static let sampleUserProfile = UserProfile(unitPreference: .imperial)
 }

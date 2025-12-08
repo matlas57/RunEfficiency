@@ -8,8 +8,9 @@
 import SwiftUI
 
 struct RunsListView: View {
+    @EnvironmentObject var userProfileStore: UserProfileStore
+
     var runs: [Run]
-    var userProfile: UserProfile
     
     var body: some View {
         VStack {
@@ -19,11 +20,12 @@ struct RunsListView: View {
             ForEach(runs) { run in
                 NavigationLink {
                     RunDetailView(
-                        viewModel: RunDetailViewModel(run: run, userProfile: userProfile),
+                        viewModel: RunDetailViewModel(run: run, userProfile: userProfileStore.profile),
                         run: run
                     )
                 } label : {
-                    RunRowView(run: run, userProfile: userProfile)
+                    RunRowView(run: run)
+                        .environmentObject(userProfileStore)
                 }
                 .buttonStyle(.plain)
             }
@@ -32,5 +34,5 @@ struct RunsListView: View {
 }
 
 #Preview {
-    RunsListView(runs: MockData.sampleRuns, userProfile: MockData.sampleUserProfile)
+    RunsListView(runs: MockData.sampleRuns)
 }

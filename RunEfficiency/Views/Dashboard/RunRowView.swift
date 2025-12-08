@@ -8,8 +8,9 @@
 import SwiftUI
 
 struct RunRowView: View {
+    @EnvironmentObject var userProfileStore: UserProfileStore
+    
     var run: Run
-    var userProfile: UserProfile
     var body: some View {
         HStack {
             VStack(alignment: .leading) {
@@ -19,7 +20,7 @@ struct RunRowView: View {
             }
             Spacer()
             HStack(spacing: 8) {
-                Text(RunFormatter.shared.distanceString(for: run, units: userProfile.unitPreference))
+                Text(RunFormatter.shared.distanceString(for: run, units: userProfileStore.profile.unitPreference))
                     .font(.headline)
                     .fontWeight(.semibold)
                 
@@ -36,5 +37,6 @@ struct RunRowView: View {
 }
 
 #Preview {
-    RunRowView(run: MockData.sampleRuns[0], userProfile: MockData.sampleUserProfile)
+    RunRowView(run: MockData.sampleRuns[0])
+        .environmentObject(UserProfileStore())
 }

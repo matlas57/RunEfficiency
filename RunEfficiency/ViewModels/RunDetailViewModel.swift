@@ -12,9 +12,7 @@ class RunDetailViewModel: ObservableObject {
     @Published var run: Run {
         didSet { recomputeAll() } //didSet observes a variable and executes the block below if the variable changes
     }
-    @Published var userProfile: UserProfile {
-        didSet { recomputeAll() }
-    }
+    @Published var userProfile: UserProfile
     @Published private(set) var economyScore = 0.0
     
     var dateString = ""

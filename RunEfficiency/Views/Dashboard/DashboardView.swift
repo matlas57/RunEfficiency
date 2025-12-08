@@ -8,17 +8,32 @@
 import SwiftUI
 
 struct DashboardView: View {
+    @EnvironmentObject var userProfileStore: UserProfileStore
+    
     @StateObject private var viewModel = DashboardViewModel()
+    @State private var showingProfile: Bool = false
+    
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
                     TrendView(points: viewModel.points)
-                    RunsListView(runs: viewModel.runs, userProfile: viewModel.userProfile)
+                    RunsListView(runs: viewModel.runs)
+                        .environmentObject(userProfileStore)
                 }
                 .padding()
             }
             .navigationTitle("Dashboard")
+            .toolbar {
+                Button {
+                    showingProfile.toggle()
+                } label: {
+                    Label("User Profile", systemImage: "gear")
+                }
+            }
+            .sheet(isPresented: $showingProfile) {
+                ProfileHost()
+            }
         }
     }
 }
