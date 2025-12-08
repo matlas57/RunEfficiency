@@ -21,14 +21,19 @@ final class RunFormatter {
         case .imperial:
             seconds = run.paceSecondsPerMile
         }
-        return formatPace(seconds)
+        return formatPace(seconds, units: units)
     }
     
-    private func formatPace(_ seconds: Double) -> String {
+    private func formatPace(_ seconds: Double, units: UnitPreference) -> String {
         guard seconds > 0 else { return "--" }
         let minutes = Int(seconds) / 60
         let secs = Int(seconds) % 60
-        return String(format: "%d:%02d min", minutes, secs)
+        switch units {
+            case .metric:
+                return String(format: "%d:%02d min/km", minutes, secs)
+            case .imperial:
+                return String(format: "%d:%02d min/mi", minutes, secs)
+        }
     }
         
     // Distance

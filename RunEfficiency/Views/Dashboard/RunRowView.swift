@@ -19,7 +19,7 @@ struct RunRowView: View {
             }
             Spacer()
             HStack(spacing: 8) {
-                Text(RunFormatter.shared.distanceString(for: run, units: userProfile.unitPrefernce))
+                Text(RunFormatter.shared.distanceString(for: run, units: userProfile.unitPreference))
                     .font(.headline)
                     .fontWeight(.semibold)
                 

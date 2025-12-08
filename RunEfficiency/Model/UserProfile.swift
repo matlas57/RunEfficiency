@@ -14,9 +14,9 @@ enum UnitPreference: String, Codable {
 
 struct UserProfile: Codable, Hashable, Identifiable {
     var id = UUID()
-    var unitPrefernce: UnitPreference
+    var unitPreference: UnitPreference
     
-    init(unitPrefernce: UnitPreference = .metric) {
-        self.unitPrefernce = unitPrefernce
+    init(unitPreference: UnitPreference = .metric) {
+        self.unitPreference = unitPreference
     }
 }

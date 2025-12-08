@@ -18,7 +18,10 @@ struct RunsListView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             ForEach(runs) { run in
                 NavigationLink {
-                    RunDetailView(run: run)
+                    RunDetailView(
+                        viewModel: RunDetailViewModel(run: run, userProfile: userProfile),
+                        run: run
+                    )
                 } label : {
                     RunRowView(run: run, userProfile: userProfile)
                 }
