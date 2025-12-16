@@ -12,7 +12,7 @@ struct GarminActivityDTO: Decodable {
     let activityName: String?
     let startTimeGMT: String
     let duration: Double
-    let distance: Double
+    let distance: Double?
     let elevationGain: Double?
     let averageHR: Double?
     let maxHR: Double?

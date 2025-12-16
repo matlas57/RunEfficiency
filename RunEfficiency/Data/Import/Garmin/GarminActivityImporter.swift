@@ -9,15 +9,21 @@ import Foundation
 
 struct GarminActivityImporter {
 
-    func importRun(from data: Data) throws -> Run {
+    func importRun(from data: Data) throws -> Run? {
         let dto = try JSONDecoder().decode(GarminActivityDTO.self, from: data)
 
+        // Only import running activities
         guard dto.activityType.typeKey == "running" else {
-            throw ImportError.notARun
+            return nil
         }
 
-        guard let date = GarminDateParser.formatter.date(from: dto.startTimeGMT) else {
-            throw ImportError.invalidDate
+        // Skip if required fields are missing
+        guard
+            let distance = dto.distance,
+            let date = GarminDateParser.formatter.date(from: dto.startTimeGMT)
+        else {
+            print("Skipping run due to missing data: \(dto.activityId)")
+            return nil
         }
 
         return Run(
@@ -25,7 +31,7 @@ struct GarminActivityImporter {
             externalActivityId: dto.activityId,
             date: date,
             name: dto.activityName ?? "Run",
-            distanceMeters: dto.distance,
+            distanceMeters: distance,
             durationSeconds: Int(dto.duration),
             elevationGainMeters: dto.elevationGain,
             averageHeartRate: dto.averageHR,
@@ -34,4 +40,5 @@ struct GarminActivityImporter {
             averageStrideLength: nil
         )
     }
+
 }
