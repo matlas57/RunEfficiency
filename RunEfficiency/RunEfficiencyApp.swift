@@ -9,6 +9,11 @@ import SwiftUI
 
 @main
 struct RunEfficiencyApp: App {
+    
+    init() {
+        GarminImportTest.runSingleActivityTest()
+    }
+    
     var body: some Scene {
         WindowGroup {
             ContentView()
