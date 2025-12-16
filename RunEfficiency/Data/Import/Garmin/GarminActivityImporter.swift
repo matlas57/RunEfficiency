@@ -13,7 +13,7 @@ struct GarminActivityImporter {
         let dto = try JSONDecoder().decode(GarminActivityDTO.self, from: data)
 
         // Only import running activities
-        guard dto.activityType.typeKey == "running" else {
+        guard dto.activityType.typeKey.contains("running") else {
             return nil
         }
 
