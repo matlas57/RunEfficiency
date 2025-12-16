@@ -37,8 +37,13 @@ struct GarminActivityImporter {
             averageHeartRate: dto.averageHR,
             maxHeartRate: dto.maxHR,
             averageCadence: dto.averageRunningCadenceInStepsPerMinute,
-            averageStrideLength: nil
+            maxCadence: dto.maxRunningCadenceInStepsPerMinute,
+            averagePowerWatts: dto.avgPower,
+            averageVerticalOscillation: dto.avgVerticalOscillation,
+            averageGroundContactTime: dto.avgGroundContactTime,
+            averageStrideLength: dto.avgStrideLength,
+            vO2Max: dto.vO2MaxValue,
+            averageVerticalRatio: dto.avgVerticalRatio
         )
     }
-
 }

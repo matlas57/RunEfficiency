@@ -33,19 +33,54 @@ struct RunDetailView: View {
                 Text("Economy Score")
             }
             .padding(.vertical)
+            
+            Divider()
+                .padding(.horizontal)
+            Text("Running Dynamics")
+                .font(.title2)
+                .padding(.bottom)
+            VStack {
+                StatRow(statName: "Avg Heart Rate", statValueString: String(viewModel.avgHRString))
+                StatRow(statName: "Stride Length", statValueString: String(viewModel.strideLengthString))
+                StatRow(statName: "Cadence", statValueString: String(viewModel.cadenceString))
+                StatRow(statName: "Power", statValueString: String(viewModel.powerString))
+                StatRow(statName: "Vertical Oscillation", statValueString: String(viewModel.verticalOscillationString))
+                StatRow(statName: "Vertical Ratio", statValueString: String(viewModel.verticalRatioString))
+                StatRow(statName: "Ground Contact Time", statValueString: String(viewModel.groundContactTimeString))
+            }
+            .padding(.horizontal, 50)
             Spacer()
         }
     }
 }
 
 #Preview {
-    let sampleRun = MockData.sampleRuns.first!
+    let sampleRun: Run = {
+    guard let url = Bundle.main.url(forResource: "activity_21263083277", withExtension: "json"),
+          let data = try? Data(contentsOf: url),
+          let run = try? GarminActivityImporter().importRun(from: data) else {
+            // fallback dummy run if import fails
+            return Run(
+                id: UUID(),
+                externalActivityId: 0,
+                date: Date(),
+                name: "Sample Run",
+                distanceMeters: 5000,
+                durationSeconds: 1500,
+                elevationGainMeters: 50,
+                averageHeartRate: 150,
+                maxHeartRate: 170,
+                averageCadence: 170,
+                averageStrideLength: 1.2
+            )
+        }
+        return run
+    }()
+    
     let profile = UserProfile(unitPreference: .metric)
 
-    let vm = RunDetailViewModel(
-        run: sampleRun,
-        userProfile: profile
-    )
+    // Create the viewmodel
+    let viewModel = RunDetailViewModel(run: sampleRun, userProfile: profile)
     
-    RunDetailView(viewModel: vm, run: sampleRun)
+    RunDetailView(viewModel: viewModel, run: sampleRun)
 }

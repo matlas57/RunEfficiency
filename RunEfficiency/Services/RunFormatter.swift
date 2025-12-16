@@ -98,10 +98,39 @@ final class RunFormatter {
         guard let stride else { return "--" }
         switch units {
         case .metric:
-            return String(format: "%.2f m", stride)
+            return String(format: "%.2f m", stride / 100.0)
         case .imperial:
-            return String(format: "%.2f ft", stride * 3.28084)
+            return String(format: "%.2f ft", stride * 0.0328084)
         }
+    }
+    
+    // Power
+    func powerString(_ watts: Double?) -> String {
+        guard let watts else { return "--" }
+        return String(format: "%.0f W", watts)
+    }
+    
+    // Vertical Oscillation
+    func verticalOscillationString(_ meters: Double?, units: UnitPreference) -> String {
+        guard let meters else { return "--" }
+        switch units {
+        case .metric:
+            return String(format: "%.0f cm", meters)
+        case .imperial:
+            return String(format: "%.0f in", meters * 0.393701)
+        }
+    }
+    
+    // Vertical Ratio
+    func verticalRatioString(_ ratio: Double?) -> String {
+        guard let ratio else { return "--" }
+        return String(format: "%.1f%%", ratio)
+    }
+    
+    // Ground Contact Time
+    func groundContactTimeString(_ gct: Double?) -> String {
+        guard let gct else {return "--" }
+        return String(format: "%.1f ms", gct)
     }
     
     // Date String
