@@ -28,6 +28,7 @@ class RunDetailViewModel: ObservableObject {
     var verticalOscillationString = ""
     var verticalRatioString = ""
     var groundContactTimeString = ""
+    var effortZoneString = ""
     
     init(run: Run, userProfile: UserProfile) {
         self.run = run
@@ -58,6 +59,7 @@ class RunDetailViewModel: ObservableObject {
         self.verticalOscillationString = RunFormatter.shared.verticalOscillationString(run.averageVerticalOscillation, units: userProfile.unitPreference)
         self.verticalRatioString = RunFormatter.shared.verticalRatioString(run.averageVerticalRatio)
         self.groundContactTimeString = RunFormatter.shared.groundContactTimeString(run.averageGroundContactTime)
+        self.effortZoneString = RunFormatter.shared.effortZoneString(run.effortZone)
     }
     
     

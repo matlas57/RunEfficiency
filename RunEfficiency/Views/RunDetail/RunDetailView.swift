@@ -21,6 +21,7 @@ struct RunDetailView: View {
                 .padding(.bottom)
                 
             VStack {
+                StatRow(statName: "Effort", statValueString: viewModel.effortZoneString)
                 StatRow(statName: "Distance", statValueString: viewModel.distanceString)
                 StatRow(statName: "Pace", statValueString: viewModel.paceString)
                 StatRow(statName: "Elevation Gain", statValueString: viewModel.elevationGainString)
@@ -28,7 +29,7 @@ struct RunDetailView: View {
             .padding(.horizontal, 65)
             
             VStack {
-                Text(String(abs(viewModel.economyScore.rounded())))
+                Text(String(format: "%.1f", abs(viewModel.economyScore)))
                     .font(.system(size: 96, weight: .black))
                 Text("Economy Score")
             }
@@ -71,7 +72,8 @@ struct RunDetailView: View {
                 averageHeartRate: 150,
                 maxHeartRate: 170,
                 averageCadence: 170,
-                averageStrideLength: 1.2
+                averageStrideLength: 1.2,
+                hrTimeInZones: nil
             )
         }
         return run

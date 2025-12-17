@@ -24,6 +24,22 @@ struct GarminActivityDTO: Decodable {
     var avgGroundContactTime: Double?
     var vO2MaxValue: Double?
     var avgVerticalRatio: Double?
+    
+    var hrTimeInZone_1: Double?
+    var hrTimeInZone_2: Double?
+    var hrTimeInZone_3: Double?
+    var hrTimeInZone_4: Double?
+    var hrTimeInZone_5: Double?
+    
+    var hrTimeInZones: [Int: Double] {
+        [
+            1: hrTimeInZone_1,
+            2: hrTimeInZone_2,
+            3: hrTimeInZone_3,
+            4: hrTimeInZone_4,
+            5: hrTimeInZone_5
+        ].compactMapValues { $0 }
+    }
 
     let activityType: ActivityTypeDTO
 

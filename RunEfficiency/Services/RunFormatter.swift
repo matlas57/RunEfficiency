@@ -133,6 +133,13 @@ final class RunFormatter {
         return String(format: "%.1f ms", gct)
     }
     
+    // Effort Zone
+    func effortZoneString(_ zone: EffortZone?) -> String {
+        guard let zone else { return "--" }
+        return String(describing: zone).capitalized
+    }
+    
+    
     // Date String
     private var dateFormatter: DateFormatter {
         let formatter = DateFormatter()
@@ -149,3 +156,4 @@ final class RunFormatter {
         dateString(for: run.date)
     }
 }
+

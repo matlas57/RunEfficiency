@@ -43,7 +43,8 @@ struct GarminActivityImporter {
             averageGroundContactTime: dto.avgGroundContactTime,
             averageStrideLength: dto.avgStrideLength,
             vO2Max: dto.vO2MaxValue,
-            averageVerticalRatio: dto.avgVerticalRatio
+            averageVerticalRatio: dto.avgVerticalRatio,
+            hrTimeInZones: dto.hrTimeInZones.isEmpty ? nil : dto.hrTimeInZones
         )
     }
 }
