@@ -15,6 +15,12 @@ class RunDetailViewModel: ObservableObject {
     @Published var userProfile: UserProfile
     @Published private(set) var economyScore = 0.0
     
+    var economyComponentScores: [Double] = []
+    var cardioScoreString = ""
+    var mechanicScoreString = ""
+    var powerScoreString = ""
+    var terrainScoreString = ""
+    
     var dateString = ""
     var distanceString = ""
     var paceString = ""
@@ -43,6 +49,7 @@ class RunDetailViewModel: ObservableObject {
     
     private func computeEconomyScore() {
         self.economyScore = RunningEconomyCalculator.computeEconomyScore(for: run)
+        self.economyComponentScores = RunningEconomyCalculator.computeEconomyScores(for: run)
     }
     
     private func setFormattedStrings() {
@@ -60,6 +67,10 @@ class RunDetailViewModel: ObservableObject {
         self.verticalRatioString = RunFormatter.shared.verticalRatioString(run.averageVerticalRatio)
         self.groundContactTimeString = RunFormatter.shared.groundContactTimeString(run.averageGroundContactTime)
         self.effortZoneString = RunFormatter.shared.effortZoneString(run.effortZone)
+        self.cardioScoreString = RunFormatter.shared.economyComponentScoreString(economyComponentScores[0])
+        self.mechanicScoreString = RunFormatter.shared.economyComponentScoreString(economyComponentScores[1])
+        self.powerScoreString = RunFormatter.shared.economyComponentScoreString(economyComponentScores[2])
+        self.terrainScoreString = RunFormatter.shared.economyComponentScoreString(economyComponentScores[3])
     }
     
     

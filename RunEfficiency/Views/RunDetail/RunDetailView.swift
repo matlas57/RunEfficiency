@@ -37,6 +37,19 @@ struct RunDetailView: View {
             
             Divider()
                 .padding(.horizontal)
+            Text("Economy Components")
+                .font(.title2)
+                .padding(.bottom)
+            VStack {
+                StatRow(statName: "Cardio Score", statValueString: String(viewModel.cardioScoreString))
+                StatRow(statName: "Mechanics Score", statValueString: String(viewModel.mechanicScoreString))
+                StatRow(statName: "Power Score", statValueString: String(viewModel.powerScoreString))
+                StatRow(statName: "Terrain Score", statValueString: String(viewModel.terrainScoreString))
+            }
+            .padding(.horizontal, 50)
+            
+            Divider()
+                .padding(.horizontal)
             Text("Running Dynamics")
                 .font(.title2)
                 .padding(.bottom)

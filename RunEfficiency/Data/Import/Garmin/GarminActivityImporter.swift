@@ -34,6 +34,7 @@ struct GarminActivityImporter {
             distanceMeters: distance,
             durationSeconds: Int(dto.duration),
             elevationGainMeters: dto.elevationGain,
+            elevationLossMeters: dto.elevationLoss,
             averageHeartRate: dto.averageHR,
             maxHeartRate: dto.maxHR,
             averageCadence: dto.averageRunningCadenceInStepsPerMinute,

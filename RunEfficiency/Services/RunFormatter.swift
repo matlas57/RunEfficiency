@@ -139,6 +139,11 @@ final class RunFormatter {
         return String(describing: zone).capitalized
     }
     
+    //Economy Component Scores
+    func economyComponentScoreString(_ score: Double?) -> String {
+        guard let score, score > 0 else { return "--"}
+        return String(format: "%.2f", score)
+    }
     
     // Date String
     private var dateFormatter: DateFormatter {

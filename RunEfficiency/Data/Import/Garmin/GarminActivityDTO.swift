@@ -14,6 +14,7 @@ struct GarminActivityDTO: Decodable {
     let duration: Double
     let distance: Double?
     let elevationGain: Double?
+    let elevationLoss: Double?
     let averageHR: Double?
     let maxHR: Double?
     let avgStrideLength: Double? 

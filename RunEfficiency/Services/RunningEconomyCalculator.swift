@@ -8,30 +8,41 @@
 import Foundation
 
 struct RunningEconomyCalculator {
-    static func computeEconomyScore(for run: Run) -> Double {
+    static func computeEconomyScores(for run: Run) -> [Double] {
         var componentScores: [Double] = []
         
         if let cardioScore = cardioEfficiencyScore(for: run), cardioScore > 0 {
             componentScores.append(normalize(raw: cardioScore, lowerBound: 1.0, upperBound: 6.0))
+        } else {
+            componentScores.append(0.0)
         }
         
-        if let mechaniceScore = mechanicsEfficiencyScore(for: run), mechaniceScore > 0 {
-            componentScores.append(normalize(raw: mechaniceScore, lowerBound: 0.0, upperBound: 1.0))
+        if let mechanicsScore = mechanicsEfficiencyScore(for: run), mechanicsScore > 0 {
+            componentScores.append(normalize(raw: mechanicsScore, lowerBound: 0.0, upperBound: 1.0))
+        } else {
+            componentScores.append(0.0)
         }
         
         if let powerScore = powerEfficiencyScore(for: run), powerScore > 0 {
             componentScores.append(normalize(raw: powerScore, lowerBound: 0.0, upperBound: 100.0))
+        } else {
+            componentScores.append(0.0)
         }
         
         if let terrainScore = terrainEfficiencyScore(for: run), terrainScore > 0 {
             componentScores.append(normalize(raw: terrainScore, lowerBound: 0.0, upperBound: 1.0))
+        } else {
+            componentScores.append(0.0)
         }
         
-        guard !componentScores.isEmpty else {
-            return 0.0
-        }
-        
-        return componentScores.reduce(0, +) / Double(componentScores.count)
+        return componentScores
+    }
+    
+    static func computeEconomyScore(for run: Run) -> Double {
+        let componentScores = computeEconomyScores(for: run)
+        guard !componentScores.isEmpty else { return 0.0 }
+        let nonZero = componentScores.count { $0 != 0.0 }
+        return componentScores.reduce(0, +) / Double(nonZero)
     }
     
     private static func cardioEfficiencyScore(for run: Run) -> Double? {
@@ -109,11 +120,11 @@ struct RunningEconomyCalculator {
             metricScores.append(normalize(raw: stride, lowerBound: 0.9, upperBound: 1.5))
         }
         
-        if let cadence = run.averageStrideLength {
+        if let cadence = run.averageCadence {
             metricScores.append(normalize(raw: cadence, lowerBound: 150, upperBound: 190))
         }
         
-        if let power = run.averageStrideLength {
+        if let power = run.averagePowerWatts {
             metricScores.append(normalize(raw: power, lowerBound: 200, upperBound: 400))
         }
         
@@ -126,29 +137,22 @@ struct RunningEconomyCalculator {
     
     private static func terrainEfficiencyScore(for run: Run) -> Double? {
         guard let elevationGain = run.elevationGainMeters,
-          let elevationLoss = run.elevationLossMeters,
-          let gct = run.averageGroundContactTime,
-          let vo = run.averageVerticalOscillation,
-          run.distanceMeters > 0
-        else {
-            return nil
-        }
+              let elevationLoss = run.elevationLossMeters,
+              let gct = run.averageGroundContactTime,
+              let vo = run.averageVerticalOscillation,
+              run.distanceMeters > 0
+        else { return nil }
 
-        // 1. Elevation factor: penalize excessive gain/loss relative to distance
-        let gainFactor = elevationGain / run.distanceMeters // m per meter
-        let lossFactor = elevationLoss / run.distanceMeters
+        // normalize each metric 0-1 (0=bad, 1=good)
+        let gainScore = max(0.0, 1.0 - min(elevationGain / 50.0, 1.0)) // higher gain = lower score
+        let lossScore = max(0.0, 1.0 - min(elevationLoss / 50.0, 1.0)) // higher loss = lower score
+        let gctScore = max(0.0, 1.0 - min(gct / 400.0, 1.0)) // higher GCT = lower score
+        let voScore = max(0.0, 1.0 - min(vo / 15.0, 1.0))   // higher VO = lower score
 
-        // 2. Ground contact time factor: lower GCT is more efficient
-        let gctFactor = 1.0 - (gct / 400.0) // assuming 400ms is a high/unfavorable GCT
-
-        // 3. Vertical oscillation factor: lower VO is better
-        let voFactor = 1.0 - (vo / 15.0) // assuming 15cm is high
-
-        // Combine metrics with weights
-        return 1.0 - ((gainFactor + lossFactor) * 0.5) // weight elevation 50%
-                     + (gctFactor * 0.25)                       // weight GCT 25%
-                     + (voFactor * 0.25)                        // weight VO 25%
+        // weighted sum
+        return 0.25 * gainScore + 0.25 * lossScore + 0.25 * gctScore + 0.25 * voScore
     }
+
     
     private static func normalize(raw: Double, lowerBound: Double, upperBound: Double) -> Double {
         guard upperBound > lowerBound else { return 0 }
