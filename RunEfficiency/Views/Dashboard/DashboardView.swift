@@ -9,6 +9,7 @@ import SwiftUI
 
 struct DashboardView: View {
     @EnvironmentObject var userProfileStore: UserProfileStore
+    @EnvironmentObject var shoeStore: ShoeStore
     
     @StateObject private var viewModel = DashboardViewModel()
     @State private var showingProfile: Bool = false
@@ -28,7 +29,7 @@ struct DashboardView: View {
                 Button {
                     showingProfile.toggle()
                 } label: {
-                    Label("User Profile", systemImage: "gear")
+                    Label("User Profile", systemImage: "person.circle")
                 }
             }
             .sheet(isPresented: $showingProfile) {
@@ -40,4 +41,6 @@ struct DashboardView: View {
 
 #Preview {
     DashboardView()
+        .environmentObject(UserProfileStore())
+        .environmentObject(ShoeStore())
 }

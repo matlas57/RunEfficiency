@@ -9,10 +9,12 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject private var userProfileStore = UserProfileStore()
+    @StateObject private var shoeStore = ShoeStore()
     
     var body: some View {
         DashboardView()
             .environmentObject(userProfileStore)
+            .environmentObject(shoeStore)
     }
 }
 

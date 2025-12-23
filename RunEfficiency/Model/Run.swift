@@ -44,6 +44,8 @@ struct Run: Codable, Hashable, Identifiable {
     }
     
     let hrTimeInZones: [Int: Double]?
+    
+    var shoeId: UUID?
 }
 
 enum EffortZone {
