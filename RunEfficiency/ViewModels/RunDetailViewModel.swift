@@ -14,6 +14,10 @@ class RunDetailViewModel: ObservableObject {
     }
     @Published var userProfile: UserProfile
     @Published private(set) var economyScore = 0.0
+    @Published var selectedShoe: Shoe?
+    
+    var shoeStore: ShoeStore
+    var onUpdate: ((Run) -> Void)?
     
     var economyComponentScores: [Double] = []
     var cardioScoreString = ""
@@ -36,9 +40,12 @@ class RunDetailViewModel: ObservableObject {
     var groundContactTimeString = ""
     var effortZoneString = ""
     
-    init(run: Run, userProfile: UserProfile) {
+    init(run: Run, userProfile: UserProfile, shoeStore: ShoeStore, onUpdate: ((Run) -> Void)? = nil) {
         self.run = run
         self.userProfile = userProfile
+        self.shoeStore = shoeStore
+        self.selectedShoe = shoeStore.getShoe(for: run.shoeId)
+        self.onUpdate = onUpdate
         recomputeAll()
         setFormattedStrings()
     }
@@ -73,5 +80,9 @@ class RunDetailViewModel: ObservableObject {
         self.terrainScoreString = RunFormatter.shared.economyComponentScoreString(economyComponentScores[3])
     }
     
-    
+    func updateShoe(to shoe: Shoe) {
+        run.shoeId = shoe.id
+        selectedShoe = shoe
+        onUpdate?(run)
+    }
 }

@@ -21,6 +21,7 @@ struct DashboardView: View {
                     TrendView(points: viewModel.points)
                     RunsListView(runs: viewModel.runs)
                         .environmentObject(userProfileStore)
+                        .environmentObject(shoeStore)
                 }
                 .padding()
             }

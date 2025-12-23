@@ -10,6 +10,12 @@ import Combine
 
 final class ShoeStore: ObservableObject {
     @Published var shoes: [Shoe] = []
+    
+    //Remove this
+    init() {
+        addShoe(shoe: Shoe(name: "NB Rebel", brand: "New Balance", stackHeightMm: 35.0, dropMm: 6.0, hasCarbonPlate: false))
+        addShoe(shoe: Shoe(name: "NB SC Elite", brand: "New Balance", stackHeightMm: 39.0, dropMm: 6.0, hasCarbonPlate: true))
+    }
 
     func addShoe(shoe: Shoe) {
         shoes.append(shoe)

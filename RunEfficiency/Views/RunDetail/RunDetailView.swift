@@ -9,8 +9,9 @@ import SwiftUI
 
 struct RunDetailView: View {
     @StateObject var viewModel: RunDetailViewModel
+    @EnvironmentObject var shoeStore: ShoeStore
     
-    var run: Run
+    @Binding var run: Run
     var body: some View {
         ScrollView {
             Text(String(run.name))
@@ -21,9 +22,10 @@ struct RunDetailView: View {
                 .padding(.bottom)
                 
             VStack {
-                StatRow(statName: "Effort", statValueString: viewModel.effortZoneString)
                 StatRow(statName: "Distance", statValueString: viewModel.distanceString)
                 StatRow(statName: "Pace", statValueString: viewModel.paceString)
+                StatRow(statName: "Effort", statValueString: viewModel.effortZoneString)
+                StatRow(statName: "Avg Heart Rate", statValueString: String(viewModel.avgHRString))
                 StatRow(statName: "Elevation Gain", statValueString: viewModel.elevationGainString)
             }
             .padding(.horizontal, 65)
@@ -60,7 +62,6 @@ struct RunDetailView: View {
                 .font(.title2)
                 .padding(.bottom)
             VStack {
-                StatRow(statName: "Avg Heart Rate", statValueString: String(viewModel.avgHRString))
                 StatRow(statName: "Stride Length", statValueString: String(viewModel.strideLengthString))
                 StatRow(statName: "Cadence", statValueString: String(viewModel.cadenceString))
                 StatRow(statName: "Power", statValueString: String(viewModel.powerString))
@@ -69,7 +70,37 @@ struct RunDetailView: View {
                 StatRow(statName: "Ground Contact Time", statValueString: String(viewModel.groundContactTimeString))
             }
             .padding(.horizontal, 50)
-            Spacer()
+            .padding(.bottom)
+            Divider()
+                .padding(.horizontal)
+            Text("Shoe")
+                .font(.title2)
+                .padding(.bottom)
+            VStack(alignment: .center) {
+                if let shoe = viewModel.shoeStore.getShoe(for: viewModel.run.shoeId) {
+                    ShoeRecord(shoe: shoe)
+                }
+                Menu {
+                    ForEach(viewModel.shoeStore.shoes) { shoe in
+                        Button(shoe.name) {
+                            viewModel.updateShoe(to: shoe)
+                        }
+                    }
+                } label: {
+                    HStack {
+                        Text(viewModel.selectedShoe != nil ? "Change Shoe" : "Select a Shoe")
+                        Spacer()
+                        Image(systemName: "chevron.down")
+                    }
+                    .padding(.horizontal, 60)
+                    .padding(.bottom)
+                    .background(.tertiary.opacity(0.1))
+                    .cornerRadius(8)
+                }
+                Text("More shoes can be added in the user profile menu")
+                    .padding(.horizontal)
+                    .padding(.bottom, 80)
+            }
         }
     }
 }
@@ -101,7 +132,8 @@ struct RunDetailView: View {
     let profile = UserProfile(unitPreference: .metric)
 
     // Create the viewmodel
-    let viewModel = RunDetailViewModel(run: sampleRun, userProfile: profile)
+    let viewModel = RunDetailViewModel(run: sampleRun, userProfile: profile, shoeStore: ShoeStore())
     
-    RunDetailView(viewModel: viewModel, run: sampleRun)
+    RunDetailView(viewModel: viewModel, run: .constant(sampleRun))
+        .environmentObject(ShoeStore())
 }

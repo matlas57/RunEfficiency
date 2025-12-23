@@ -10,7 +10,7 @@ import SwiftUI
 struct RunRowView: View {
     @EnvironmentObject var userProfileStore: UserProfileStore
     
-    var run: Run
+    @Binding var run: Run
     var body: some View {
         HStack {
             VStack(alignment: .leading) {
@@ -34,9 +34,4 @@ struct RunRowView: View {
         .background(.secondary.opacity(0.1))
         .cornerRadius(12)
     }
-}
-
-#Preview {
-    RunRowView(run: MockData.sampleRuns[0])
-        .environmentObject(UserProfileStore())
 }

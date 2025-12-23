@@ -9,30 +9,35 @@ import SwiftUI
 
 struct RunsListView: View {
     @EnvironmentObject var userProfileStore: UserProfileStore
+    @EnvironmentObject var shoeStore: ShoeStore
 
-    var runs: [Run]
+    @State var runs: [Run]
     
     var body: some View {
         VStack {
             Text("Recent Runs")
                 .font(.headline)
                 .frame(maxWidth: .infinity, alignment: .leading)
-            ForEach(runs) { run in
+            ForEach(runs.indices, id: \.self) { index in
                 NavigationLink {
                     RunDetailView(
-                        viewModel: RunDetailViewModel(run: run, userProfile: userProfileStore.profile),
-                        run: run
+                        viewModel: RunDetailViewModel(
+                            run: runs[index],
+                            userProfile: userProfileStore.profile,
+                            shoeStore: shoeStore,
+                            onUpdate: { updatedRun in
+                                runs[index] = updatedRun
+                            }
+                        ),
+                        run: $runs[index],
                     )
+                    .environmentObject(shoeStore)
                 } label : {
-                    RunRowView(run: run)
+                    RunRowView(run: $runs[index])
                         .environmentObject(userProfileStore)
                 }
                 .buttonStyle(.plain)
             }
         }
     }
-}
-
-#Preview {
-    RunsListView(runs: MockData.sampleRuns)
 }
