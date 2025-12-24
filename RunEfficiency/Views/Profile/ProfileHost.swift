@@ -33,9 +33,7 @@ struct ProfileHost: View {
                     VStack(alignment: .leading, spacing: 12) {
                         Text("Shoe Library")
                             .font(.headline)
-
                         ShoeLibrary()
-                            .environmentObject(shoeStore)
                     }
                     .padding()
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -48,7 +46,6 @@ struct ProfileHost: View {
             .navigationTitle("Profile")
         }
     }
-
 
 }
 

@@ -20,8 +20,6 @@ struct DashboardView: View {
                 VStack(alignment: .leading, spacing: 24) {
                     TrendView(points: viewModel.points)
                     RunsListView(runs: viewModel.runs)
-                        .environmentObject(userProfileStore)
-                        .environmentObject(shoeStore)
                 }
                 .padding()
             }

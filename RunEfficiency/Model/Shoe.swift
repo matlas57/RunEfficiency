@@ -16,5 +16,7 @@ struct Shoe: Identifiable, Codable, Hashable {
     //Shoe specs
     var stackHeightMm: Double?
     var dropMm: Double?
-    var hasCarbonPlate: Bool?
+    var hasCarbonPlate: Bool = false
+    
+    static let empty = Shoe(id: UUID(), name: "", brand: "", stackHeightMm: 0.0, dropMm: 0.0, hasCarbonPlate: false)
 }

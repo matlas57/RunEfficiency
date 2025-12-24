@@ -11,41 +11,54 @@ struct AddShoeView: View {
     @EnvironmentObject var shoeStore: ShoeStore
     @Environment(\.dismiss) private var dismiss
 
+    @Binding var shoeToEdit: Shoe
+    let isNew: Bool
+
     @State private var name: String = ""
     @State private var stackHeight: String = ""
     @State private var drop: String = ""
     @State private var hasPlate: Bool = false
-    
-    @FocusState private var focusedField: Field?
-    
-    enum Field {
-        case name
-    }
 
     var body: some View {
         NavigationView {
             Form {
                 Section(header: Text("Shoe Details")) {
                     TextField("Name", text: $name)
-
                     TextField("Stack Height (mm)", text: $stackHeight)
                         .keyboardType(.decimalPad)
-
                     TextField("Drop (mm)", text: $drop)
                         .keyboardType(.decimalPad)
-
                     Toggle("Plated", isOn: $hasPlate)
                 }
             }
-            .navigationTitle("Add Shoe")
+            .navigationTitle(isNew ? "Add Shoe" : "Edit Shoe")
+            .onAppear {
+                // Initialize state from the binding
+                name = shoeToEdit.name
+                stackHeight = String(shoeToEdit.stackHeightMm ?? 0)
+                drop =  String(shoeToEdit.dropMm ?? 0)
+                hasPlate = shoeToEdit.hasCarbonPlate
+            }
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
-                        saveShoe()
+                        // Write local state back to binding
+                        shoeToEdit.name = name
+                        shoeToEdit.stackHeightMm = Double(stackHeight)
+                        shoeToEdit.dropMm = Double(drop)
+                        shoeToEdit.hasCarbonPlate = hasPlate
+
+                        if isNew {
+                            shoeStore.addShoe(shoe: shoeToEdit)
+                        } else {
+                            shoeStore.updateShoe(shoeToEdit)
+                        }
+
+                        dismiss()
                     }
                     .disabled(name.isEmpty)
                 }
-
+                
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") {
                         dismiss()
@@ -54,21 +67,6 @@ struct AddShoeView: View {
             }
         }
     }
-    
-    private func saveShoe() {
-        let shoe = Shoe(
-            id: UUID(),
-            name: name,
-            stackHeightMm: Double(stackHeight),
-            dropMm: Double(drop),
-            hasCarbonPlate: hasPlate
-        )
-
-        shoeStore.addShoe(shoe: shoe)
-        dismiss()
-    }
 }
 
-#Preview {
-    AddShoeView()
-}
+

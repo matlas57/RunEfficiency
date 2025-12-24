@@ -8,28 +8,29 @@
 import SwiftUI
 
 struct ShoeRecord: View {
-    var shoe: Shoe
+    let shoe: Shoe
+
     var body: some View {
-        VStack(alignment: .leading) {
+        VStack(alignment: .leading, spacing: 4) {
             Text(shoe.name)
                 .font(.headline)
-                .padding(.bottom, 4)
-            HStack(spacing: 24) {
+
+            HStack(spacing: 8) {
                 if let stack = shoe.stackHeightMm {
-                    ShoeAttribute(label: "Stack", value: "\(Int(stack)) mm")
+                    Text("Stack: \(stack, specifier: "%.1f") mm")
                 }
                 if let drop = shoe.dropMm {
-                    ShoeAttribute(label: "Drop", value: "\(Int(drop)) mm")
+                    Text("Drop: \(drop, specifier: "%.1f") mm")
                 }
-                if let plate = shoe.hasCarbonPlate {
-                    ShoeAttribute(
-                        label: "Has Plate",
-                        value: plate ? "Yes" : "No"
-                    )
+                
+
+                if shoe.hasCarbonPlate == true {
+                    Text("Plated")
                 }
             }
+            .font(.caption)
+            .foregroundStyle(.secondary)
         }
-        .padding(.bottom)
     }
 }
 

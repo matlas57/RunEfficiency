@@ -11,7 +11,7 @@ import Combine
 final class ShoeStore: ObservableObject {
     @Published var shoes: [Shoe] = []
     
-    //Remove this
+    //TODO: Remove this
     init() {
         addShoe(shoe: Shoe(name: "NB Rebel", brand: "New Balance", stackHeightMm: 35.0, dropMm: 6.0, hasCarbonPlate: false))
         addShoe(shoe: Shoe(name: "NB SC Elite", brand: "New Balance", stackHeightMm: 39.0, dropMm: 6.0, hasCarbonPlate: true))
@@ -19,6 +19,16 @@ final class ShoeStore: ObservableObject {
 
     func addShoe(shoe: Shoe) {
         shoes.append(shoe)
+    }
+    
+    func updateShoe(_ shoe: Shoe) {
+        if let index = shoes.firstIndex(of: shoe) {
+            shoes[index] = shoe
+        }
+    }
+    
+    func deleteShoe(_ shoe: Shoe) {
+        shoes.removeAll { $0.id == shoe.id }
     }
 
     func getShoe(for id: UUID?) -> Shoe? {
