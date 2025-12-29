@@ -16,13 +16,8 @@ class DashboardViewModel: ObservableObject {
     private let batchImporter = GarminBatchImporter()
     
     init() {
-//        loadMockData()
         loadGarminRuns()
         updatePoints()
-    }
-    
-    private func loadMockData() {
-        self.runs = MockData.sampleRuns.sorted { $0.date > $1.date } //load runs newest to oldest
     }
     
     private func loadGarminRuns() {
