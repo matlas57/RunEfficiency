@@ -105,35 +105,35 @@ struct RunDetailView: View {
     }
 }
 
-#Preview {
-    let sampleRun: Run = {
-    guard let url = Bundle.main.url(forResource: "activity_21263083277", withExtension: "json"),
-          let data = try? Data(contentsOf: url),
-          let run = try? GarminActivityImporter().importRun(from: data) else {
-            // fallback dummy run if import fails
-            return Run(
-                id: UUID(),
-                externalActivityId: 0,
-                date: Date(),
-                name: "Sample Run",
-                distanceMeters: 5000,
-                durationSeconds: 1500,
-                elevationGainMeters: 50,
-                averageHeartRate: 150,
-                maxHeartRate: 170,
-                averageCadence: 170,
-                averageStrideLength: 1.2,
-                hrTimeInZones: nil
-            )
-        }
-        return run
-    }()
-    
-    let profile = UserProfile(unitPreference: .metric)
-
-    // Create the viewmodel
-    let viewModel = RunDetailViewModel(run: sampleRun, userProfile: profile, shoeStore: ShoeStore())
-    
-    RunDetailView(viewModel: viewModel, run: .constant(sampleRun))
-        .environmentObject(ShoeStore())
-}
+//#Preview {
+//    let sampleRun: Run = {
+//    guard let url = Bundle.main.url(forResource: "activity_21263083277", withExtension: "json"),
+//          let data = try? Data(contentsOf: url),
+//          let run = try? GarminActivityImporter().importRun(from: data) else {
+//            // fallback dummy run if import fails
+//            return Run(
+//                id: UUID(),
+//                externalActivityId: 0,
+//                date: Date(),
+//                name: "Sample Run",
+//                distanceMeters: 5000,
+//                durationSeconds: 1500,
+//                elevationGainMeters: 50,
+//                averageHeartRate: 150,
+//                maxHeartRate: 170,
+//                averageCadence: 170,
+//                averageStrideLength: 1.2,
+//                hrTimeInZones: nil
+//            )
+//        }
+//        return run
+//    }()
+//    
+//    let profile = UserProfile(unitPreference: .metric)
+//
+//    // Create the viewmodel
+//    let viewModel = RunDetailViewModel(run: sampleRun, userProfile: profile, shoeStore: ShoeStore())
+//    
+//    RunDetailView(viewModel: viewModel, run: .constant(sampleRun))
+//        .environmentObject(ShoeStore())
+//}

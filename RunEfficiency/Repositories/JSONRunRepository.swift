@@ -6,8 +6,9 @@
 //
 
 import Foundation
+import Combine
 
-final class JSONRunRepository: RunRepository {
+final class JSONRunRepository: RunRepository, ObservableObject {
 
     private let loader: GarminBatchImporter
 

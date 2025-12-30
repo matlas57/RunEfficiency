@@ -7,8 +7,9 @@
 
 import Foundation
 import CoreData
+import Combine
 
-final class CoreDataRunRepository: RunRepository {
+final class CoreDataRunRepository: RunRepository, ObservableObject {
 
     private let context: NSManagedObjectContext
 

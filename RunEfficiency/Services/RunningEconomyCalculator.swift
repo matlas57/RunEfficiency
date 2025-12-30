@@ -8,7 +8,10 @@
 import Foundation
 
 struct RunningEconomyCalculator {
-    static func computeEconomyScores(for run: Run) -> [Double] {
+    
+    let baselineCalculator: BaselineCalculator
+    
+    func computeEconomyScores(for run: Run) -> [Double] {
         var componentScores: [Double] = []
         
         if let cardioScore = cardioEfficiencyScore(for: run), cardioScore > 0 {
@@ -38,14 +41,14 @@ struct RunningEconomyCalculator {
         return componentScores
     }
     
-    static func computeEconomyScore(for run: Run) -> Double {
+    func computeEconomyScore(for run: Run) -> Double {
         let componentScores = computeEconomyScores(for: run)
         guard !componentScores.isEmpty else { return 0.0 }
         let nonZero = componentScores.count { $0 != 0.0 }
         return componentScores.reduce(0, +) / Double(nonZero)
     }
     
-    private static func cardioEfficiencyScore(for run: Run) -> Double? {
+    private func cardioEfficiencyScore(for run: Run) -> Double? {
         guard run.distanceMeters > 0,
               run.durationSeconds > 0
         else {
@@ -61,7 +64,7 @@ struct RunningEconomyCalculator {
         return speed / effort
     }
     
-    private static func zoneWeightedEffort(for run: Run) -> Double? {
+    private func zoneWeightedEffort(for run: Run) -> Double? {
         // Handle optional type hrTimeInZones
         guard let hrTimeInZones = run.hrTimeInZones,
               !hrTimeInZones.isEmpty
@@ -90,7 +93,7 @@ struct RunningEconomyCalculator {
         return weightedSum / totalTime
     }
     
-    private static func mechanicsEfficiencyScore(for run: Run) -> Double? {
+    private func mechanicsEfficiencyScore(for run: Run) -> Double? {
         var penalties: [Double] = []
         
         if let verticalRatio = run.averageVerticalRatio {
@@ -107,13 +110,13 @@ struct RunningEconomyCalculator {
         return 1.0 / avgPenalty
     }
     
-    private static func mechanicPenalty(mechanicValue: Double, ideal: Double, maxThreshold: Double) -> Double {
+    private func mechanicPenalty(mechanicValue: Double, ideal: Double, maxThreshold: Double) -> Double {
         let diff = max(0, mechanicValue - ideal)
         
         return 1.0 + pow(diff / (maxThreshold - ideal), 2)
     }
     
-    private static func powerEfficiencyScore(for run: Run) -> Double? {
+    private func powerEfficiencyScore(for run: Run) -> Double? {
         var metricScores: [Double] = []
         
         if let stride = run.averageStrideLength {
@@ -135,7 +138,7 @@ struct RunningEconomyCalculator {
         return metricScores.reduce(0, +) / Double(metricScores.count)
     }
     
-    private static func terrainEfficiencyScore(for run: Run) -> Double? {
+    private func terrainEfficiencyScore(for run: Run) -> Double? {
         guard let elevationGain = run.elevationGainMeters,
               let elevationLoss = run.elevationLossMeters,
               let gct = run.averageGroundContactTime,
@@ -152,9 +155,8 @@ struct RunningEconomyCalculator {
         // weighted sum
         return 0.25 * gainScore + 0.25 * lossScore + 0.25 * gctScore + 0.25 * voScore
     }
-
     
-    private static func normalize(raw: Double, lowerBound: Double, upperBound: Double) -> Double {
+    private func normalize(raw: Double, lowerBound: Double, upperBound: Double) -> Double {
         guard upperBound > lowerBound else { return 0 }
         
         let clamped = Swift.min(Swift.max(raw, lowerBound), upperBound)
@@ -162,5 +164,4 @@ struct RunningEconomyCalculator {
         
         return normalized * 100.0
     }
-
 }

@@ -10,6 +10,7 @@ import SwiftUI
 struct RunsListView: View {
     @EnvironmentObject var userProfileStore: UserProfileStore
     @EnvironmentObject var shoeStore: ShoeStore
+    @EnvironmentObject var runRepository: CoreDataRunRepository
 
     @State var runs: [Run]
     
@@ -24,6 +25,7 @@ struct RunsListView: View {
                         viewModel: RunDetailViewModel(
                             run: runs[index],
                             userProfile: userProfileStore.profile,
+                            runRepository: runRepository,
                             shoeStore: shoeStore,
                             onUpdate: { updatedRun in
                                 runs[index] = updatedRun

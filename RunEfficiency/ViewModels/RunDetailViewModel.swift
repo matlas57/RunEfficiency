@@ -16,6 +16,10 @@ class RunDetailViewModel: ObservableObject {
     @Published private(set) var economyScore = 0.0
     @Published var selectedShoe: Shoe?
     
+    private let runRepository: any RunRepository
+    
+    private let runningEconomyCalculator: RunningEconomyCalculator
+    
     var shoeStore: ShoeStore
     var onUpdate: ((Run) -> Void)?
     
@@ -40,11 +44,16 @@ class RunDetailViewModel: ObservableObject {
     var groundContactTimeString = ""
     var effortZoneString = ""
     
-    init(run: Run, userProfile: UserProfile, shoeStore: ShoeStore, onUpdate: ((Run) -> Void)? = nil) {
+    init(run: Run, userProfile: UserProfile, runRepository: any RunRepository, shoeStore: ShoeStore, onUpdate: ((Run) -> Void)? = nil) {
         self.run = run
         self.userProfile = userProfile
-        self.shoeStore = shoeStore
         self.selectedShoe = shoeStore.getShoe(for: run.shoeId)
+        self.runRepository = runRepository
+        
+        let baselineCalculator = BaselineCalculator(runRepository: runRepository)
+        self.runningEconomyCalculator = RunningEconomyCalculator(baselineCalculator: baselineCalculator)
+        
+        self.shoeStore = shoeStore
         self.onUpdate = onUpdate
         recomputeAll()
         setFormattedStrings()
@@ -55,8 +64,8 @@ class RunDetailViewModel: ObservableObject {
     }
     
     private func computeEconomyScore() {
-        self.economyScore = RunningEconomyCalculator.computeEconomyScore(for: run)
-        self.economyComponentScores = RunningEconomyCalculator.computeEconomyScores(for: run)
+        self.economyScore = runningEconomyCalculator.computeEconomyScore(for: run)
+        self.economyComponentScores = runningEconomyCalculator.computeEconomyScores(for: run)
     }
     
     private func setFormattedStrings() {

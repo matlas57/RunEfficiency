@@ -11,11 +11,15 @@ import CoreData
 struct ContentView: View {
     @StateObject private var userProfileStore = UserProfileStore()
     @StateObject private var shoeStore = ShoeStore()
+    @StateObject private var runRepository = CoreDataRunRepository(
+        context: PersistenceController.shared.container.viewContext
+    )
     
     var body: some View {
-        DashboardView()
+        DashboardView(viewModel: DashboardViewModel(runRepository: runRepository))
             .environmentObject(userProfileStore)
             .environmentObject(shoeStore)
+            .environmentObject(runRepository)
     }
 }
 

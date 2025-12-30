@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol RunRepository {
+protocol RunRepository: ObservableObject {
     /// Source of truth for reading runs
     func fetchAllRuns() throws -> [Run]
 

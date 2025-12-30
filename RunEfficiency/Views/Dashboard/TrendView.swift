@@ -38,7 +38,3 @@ struct TrendView: View {
         }
     }
 }
-
-#Preview {
-    TrendView(points: DashboardViewModel().points)
-}

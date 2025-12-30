@@ -9,30 +9,34 @@ import Foundation
 import Combine
 import CoreData
 
-class DashboardViewModel: ObservableObject {
+final class DashboardViewModel: ObservableObject {
     @Published var runs: [Run] = []
     //private(set) means the property can be read publically but only written inside this type. Guarantees that updatePoints is the only way points is modified
     @Published private(set) var points: [RunningEconomyPoint] = []
     
+    private let runRepository: any RunRepository
     private let batchImporter = GarminBatchImporter()
+    private let JSONRepo = JSONRunRepository(loader: GarminBatchImporter())
     
-    private let repository = JSONRunRepository(loader: GarminBatchImporter())
+    private let runningEconomyCalculator: RunningEconomyCalculator
     
-    let coreDataRepo = CoreDataRunRepository(
-        context: PersistenceController.shared.container.viewContext
-    )
-    
-    init() {
+    init(runRepository: any RunRepository) {
+        self.runRepository = runRepository
+        
+        let baselineCalculator = BaselineCalculator(runRepository: runRepository)
+        self.runningEconomyCalculator = RunningEconomyCalculator(baselineCalculator: baselineCalculator)
+        
         loadGarminRuns()
         updatePoints()
     }
     
+    //This will change once data is pulled directly from GarminDB
     private func loadGarminRuns() {
         do {
-            let importedRuns = try repository.fetchAllRuns()
+            let importedRuns = try JSONRepo.fetchAllRuns()
             self.runs = importedRuns.sorted { $0.date > $1.date }
             for run in runs {
-                try coreDataRepo.save(run: run)
+                try runRepository.save(run: run)
             }
         } catch {
             print("Failed to import Garmin runs:", error)
@@ -45,7 +49,7 @@ class DashboardViewModel: ObservableObject {
             .map { run in
                 RunningEconomyPoint(
                     date: run.date,
-                    efficiencyScore: RunningEconomyCalculator.computeEconomyScore(for: run)
+                    efficiencyScore: runningEconomyCalculator.computeEconomyScore(for: run)
                 )
             }
             .sorted { $0.date < $1.date }

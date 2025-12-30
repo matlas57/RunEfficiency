@@ -11,25 +11,28 @@ import CoreData
 struct DashboardView: View {
     @EnvironmentObject var userProfileStore: UserProfileStore
     @EnvironmentObject var shoeStore: ShoeStore
-    
-    @StateObject private var viewModel = DashboardViewModel()
+    @EnvironmentObject var runRepository: CoreDataRunRepository
+
     @State private var showingProfile: Bool = false
+    
+    // viewModel is created in ContentView and passed to DashboardView using singleton runRepository
+    var viewModel: DashboardViewModel
     
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
-                    Button("Reset Runs") {
-                        do {
-                            try viewModel.coreDataRepo.deleteAllRuns()
-                        } catch {
-                            print("Failed to delete runs:", error)
-                        }
-                    }
+//                    Button("Reset Runs") {
+//                        do {
+//                            try runRepository.deleteAllRuns()
+//                        } catch {
+//                            print("Failed to delete runs:", error)
+//                        }
+//                    }
                     
-                    if let coreDataRuns = try? viewModel.coreDataRepo.fetchAllRuns() {
-                        Text("Core Data Runs: \(coreDataRuns.count)")
-                    }
+//                    if let coreDataRuns = try? runRepository.fetchAllRuns() {
+//                        Text("Core Data Runs: \(coreDataRuns.count)")
+//                    }
                     
                     TrendView(points: viewModel.points)
                     RunsListView(runs: viewModel.runs)
@@ -52,7 +55,8 @@ struct DashboardView: View {
 }
 
 #Preview {
-    DashboardView()
+    DashboardView(viewModel: DashboardViewModel(runRepository: CoreDataRunRepository(context: PersistenceController.shared.container.viewContext)))
         .environmentObject(UserProfileStore())
         .environmentObject(ShoeStore())
+        .environmentObject(CoreDataRunRepository(context: PersistenceController.shared.container.viewContext))
 }
