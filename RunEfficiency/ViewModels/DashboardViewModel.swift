@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import CoreData
 
 class DashboardViewModel: ObservableObject {
     @Published var runs: [Run] = []
@@ -15,6 +16,12 @@ class DashboardViewModel: ObservableObject {
     
     private let batchImporter = GarminBatchImporter()
     
+    private let repository = JSONRunRepository(loader: GarminBatchImporter())
+    
+    let coreDataRepo = CoreDataRunRepository(
+        context: PersistenceController.shared.container.viewContext
+    )
+    
     init() {
         loadGarminRuns()
         updatePoints()
@@ -22,8 +29,11 @@ class DashboardViewModel: ObservableObject {
     
     private func loadGarminRuns() {
         do {
-            let importedRuns = try batchImporter.importRunsFromBundle()
+            let importedRuns = try repository.fetchAllRuns()
             self.runs = importedRuns.sorted { $0.date > $1.date }
+            for run in runs {
+                try coreDataRepo.save(run: run)
+            }
         } catch {
             print("Failed to import Garmin runs:", error)
         }

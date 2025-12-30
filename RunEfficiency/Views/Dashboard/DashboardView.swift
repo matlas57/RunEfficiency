@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import CoreData
 
 struct DashboardView: View {
     @EnvironmentObject var userProfileStore: UserProfileStore
@@ -18,6 +19,18 @@ struct DashboardView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
+                    Button("Reset Runs") {
+                        do {
+                            try viewModel.coreDataRepo.deleteAllRuns()
+                        } catch {
+                            print("Failed to delete runs:", error)
+                        }
+                    }
+                    
+                    if let coreDataRuns = try? viewModel.coreDataRepo.fetchAllRuns() {
+                        Text("Core Data Runs: \(coreDataRuns.count)")
+                    }
+                    
                     TrendView(points: viewModel.points)
                     RunsListView(runs: viewModel.runs)
                 }

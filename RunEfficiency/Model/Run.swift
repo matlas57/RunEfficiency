@@ -34,6 +34,8 @@ struct Run: Codable, Hashable, Identifiable {
     
     var averageSpeedMetersPerSecond: Double?
     
+    var shoeId: UUID?
+
     // Computed raw values that do NOT depend on units or formatting
     var paceSecondsPerKm: Double {
         distanceMeters > 0 ? Double(durationSeconds) / (distanceMeters / 1000.0) : 0
@@ -45,7 +47,6 @@ struct Run: Codable, Hashable, Identifiable {
     
     let hrTimeInZones: [Int: Double]?
     
-    var shoeId: UUID?
 }
 
 enum EffortZone {

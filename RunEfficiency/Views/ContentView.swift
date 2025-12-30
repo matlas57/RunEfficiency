@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import CoreData
 
 struct ContentView: View {
     @StateObject private var userProfileStore = UserProfileStore()
@@ -20,4 +21,6 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
+        .environment(\.managedObjectContext,
+              PersistenceController.preview.container.viewContext)
 }
