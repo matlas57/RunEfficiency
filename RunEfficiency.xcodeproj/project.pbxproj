@@ -6,7 +6,16 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		4E1B61182F02FDBA007D6AA9 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4E1B61172F02FDBA007D6AA9 /* CoreData.framework */; };
+		4E1B61382F03128A007D6AA9 /* RunEntity+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E1B61372F03128A007D6AA9 /* RunEntity+CoreDataProperties.swift */; };
+		4E1B61392F03128A007D6AA9 /* RunEntity+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E1B61362F03128A007D6AA9 /* RunEntity+CoreDataClass.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
+		4E1B61172F02FDBA007D6AA9 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		4E1B61362F03128A007D6AA9 /* RunEntity+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "RunEntity+CoreDataClass.swift"; path = "RunEfficiency/Model/RunEntity+CoreDataClass.swift"; sourceTree = "<group>"; };
+		4E1B61372F03128A007D6AA9 /* RunEntity+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "RunEntity+CoreDataProperties.swift"; path = "RunEfficiency/Model/RunEntity+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		4E8AFEDF2EE20B4000A60316 /* RunEfficiency.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RunEfficiency.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -23,16 +32,28 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4E1B61182F02FDBA007D6AA9 /* CoreData.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		4E1B61162F02FDBA007D6AA9 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				4E1B61172F02FDBA007D6AA9 /* CoreData.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		4E8AFED62EE20B4000A60316 = {
 			isa = PBXGroup;
 			children = (
+				4E1B61362F03128A007D6AA9 /* RunEntity+CoreDataClass.swift */,
+				4E1B61372F03128A007D6AA9 /* RunEntity+CoreDataProperties.swift */,
 				4E8AFEE12EE20B4000A60316 /* RunEfficiency */,
+				4E1B61162F02FDBA007D6AA9 /* Frameworks */,
 				4E8AFEE02EE20B4000A60316 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -119,6 +140,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4E1B61382F03128A007D6AA9 /* RunEntity+CoreDataProperties.swift in Sources */,
+				4E1B61392F03128A007D6AA9 /* RunEntity+CoreDataClass.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
