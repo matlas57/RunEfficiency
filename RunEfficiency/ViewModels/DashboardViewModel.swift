@@ -13,19 +13,21 @@ final class DashboardViewModel: ObservableObject {
     @Published var runs: [Run] = []
     //private(set) means the property can be read publically but only written inside this type. Guarantees that updatePoints is the only way points is modified
     @Published private(set) var points: [RunningEconomyPoint] = []
+    @Published private(set) var baselines: MechanicsBaselines?
     
     private let runRepository: any RunRepository
     private let batchImporter = GarminBatchImporter()
     private let JSONRepo = JSONRunRepository(loader: GarminBatchImporter())
     
-    private let runningEconomyCalculator: RunningEconomyCalculator
+    private let baselineCalculator: BaselineCalculator
     
     init(runRepository: any RunRepository) {
         self.runRepository = runRepository
         
-        let baselineCalculator = BaselineCalculator(runRepository: runRepository)
-        self.runningEconomyCalculator = RunningEconomyCalculator(baselineCalculator: baselineCalculator)
+        self.baselineCalculator = BaselineCalculator(runRepository: runRepository)
         
+        computeBaselines()
+
         loadGarminRuns()
         updatePoints()
     }
@@ -49,9 +51,13 @@ final class DashboardViewModel: ObservableObject {
             .map { run in
                 RunningEconomyPoint(
                     date: run.date,
-                    efficiencyScore: runningEconomyCalculator.computeEconomyScore(for: run)
+                    efficiencyScore: RunningEconomyCalculator.computeEconomyScore(for: run, baselines: baselines)
                 )
             }
             .sorted { $0.date < $1.date }
+    }
+    
+    private func computeBaselines() {
+        baselines = baselineCalculator.computeMechanicsScoreBaselines()
     }
 }

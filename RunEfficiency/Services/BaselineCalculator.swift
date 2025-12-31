@@ -13,6 +13,11 @@ struct MetricBaseline {
     let sampleCount: Int
 }
 
+struct MechanicsBaselines {
+    let verticalRatioBaseline: MetricBaseline?
+    let groundContactTimeBaseline: MetricBaseline?
+}
+
 final class BaselineCalculator {
     private let runRepository: any RunRepository
     
@@ -24,7 +29,7 @@ final class BaselineCalculator {
         let allRuns = try runRepository.fetchAllRuns()
         
         let baselineRuns = allRuns.filter { run in
-            if run.averageGroundContactTime != nil {
+            if run.averageGroundContactTime != nil && run.averageVerticalRatio != nil {
                 return run.durationSeconds >= 600
             } else { return false }
         }
@@ -32,14 +37,27 @@ final class BaselineCalculator {
         return baselineRuns
     }
     
-    func computeBaseline(for keyPath: KeyPath<Run, Double?>) throws -> MetricBaseline? {
+    func computeMechanicsScoreBaselines() -> MechanicsBaselines? {
+        do {
+            let vrBaseline = try computeBaseline(for: \.averageVerticalRatio)
+            let gctBaseline = try computeBaseline(for: \.averageGroundContactTime)
+            return MechanicsBaselines(
+                verticalRatioBaseline: vrBaseline,
+                groundContactTimeBaseline: gctBaseline
+            )
+        } catch {
+            return nil
+        }
+    }
+    
+    private func computeBaseline(for keyPath: KeyPath<Run, Double?>) throws -> MetricBaseline? {
           // get all runs from CoreData that conform to the baseline filter
           let runs = try fetchRuns()
           
           // Extract valid metric (non nil) values for the specific metric specified in keyPath
           let values = runs.compactMap { $0[keyPath: keyPath] }
-          // Ensure there are runs to use
-          guard !values.isEmpty else { return nil }
+          // Ensure there are engough runs to compute a baseline
+          guard values.count > 10 else { return nil }
 
           // Compute fields of MetricBaseline
           let mean = values.reduce(0, +) / Double(values.count)

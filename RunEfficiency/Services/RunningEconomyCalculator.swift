@@ -7,48 +7,70 @@
 
 import Foundation
 
+struct ComponentScore {
+    let score: Double
+    let usesBaseline: Bool
+}
+
 struct RunningEconomyCalculator {
     
-    let baselineCalculator: BaselineCalculator
-    
-    func computeEconomyScores(for run: Run) -> [Double] {
-        var componentScores: [Double] = []
+    static func computeEconomyScores(for run: Run, baselines: MechanicsBaselines?) -> [ComponentScore] {
+        var componentScores: [ComponentScore] = []
         
         if let cardioScore = cardioEfficiencyScore(for: run), cardioScore > 0 {
-            componentScores.append(normalize(raw: cardioScore, lowerBound: 1.0, upperBound: 6.0))
+            componentScores.append(
+                ComponentScore(
+                    score: normalize(raw: cardioScore, lowerBound: 1.0, upperBound: 6.0),
+                    usesBaseline: false)
+                )
         } else {
-            componentScores.append(0.0)
+            componentScores.append(ComponentScore(score: 0.0, usesBaseline: false))
         }
         
         if let mechanicsScore = mechanicsEfficiencyScore(for: run), mechanicsScore > 0 {
-            componentScores.append(normalize(raw: mechanicsScore, lowerBound: 0.0, upperBound: 1.0))
+            componentScores.append(
+                ComponentScore(
+                    score: normalize(raw: mechanicsScore, lowerBound: 0.0, upperBound: 1.0),
+                    usesBaseline: false
+                )
+            )
         } else {
-            componentScores.append(0.0)
+            componentScores.append(ComponentScore(score: 0.0, usesBaseline: false))
         }
         
         if let powerScore = powerEfficiencyScore(for: run), powerScore > 0 {
-            componentScores.append(normalize(raw: powerScore, lowerBound: 0.0, upperBound: 100.0))
+            componentScores.append(
+                ComponentScore(
+                    score: normalize(raw: powerScore, lowerBound: 0.0, upperBound: 100.0),
+                    usesBaseline: false
+                )
+            )
         } else {
-            componentScores.append(0.0)
+            componentScores.append(ComponentScore(score: 0.0, usesBaseline: false))
         }
         
         if let terrainScore = terrainEfficiencyScore(for: run), terrainScore > 0 {
-            componentScores.append(normalize(raw: terrainScore, lowerBound: 0.0, upperBound: 1.0))
+            componentScores.append(
+                ComponentScore(
+                    score: normalize(raw: terrainScore, lowerBound: 0.0, upperBound: 1.0),
+                    usesBaseline: false
+                )
+            )
         } else {
-            componentScores.append(0.0)
+            componentScores.append(ComponentScore(score: 0.0, usesBaseline: false))
         }
         
         return componentScores
     }
     
-    func computeEconomyScore(for run: Run) -> Double {
-        let componentScores = computeEconomyScores(for: run)
+    static func computeEconomyScore(for run: Run, baselines: MechanicsBaselines?) -> Double {
+        let componentScores = computeEconomyScores(for: run, baselines: baselines)
         guard !componentScores.isEmpty else { return 0.0 }
-        let nonZero = componentScores.count { $0 != 0.0 }
-        return componentScores.reduce(0, +) / Double(nonZero)
+        let nonZero = componentScores.count { $0.score != 0.0 }
+        return componentScores.reduce(0.0) { $0 + $1.score} / Double(nonZero)
     }
     
-    private func cardioEfficiencyScore(for run: Run) -> Double? {
+    private static func cardioEfficiencyScore(for run: Run) -> Double? {
         guard run.distanceMeters > 0,
               run.durationSeconds > 0
         else {
@@ -64,7 +86,7 @@ struct RunningEconomyCalculator {
         return speed / effort
     }
     
-    private func zoneWeightedEffort(for run: Run) -> Double? {
+    private static func zoneWeightedEffort(for run: Run) -> Double? {
         // Handle optional type hrTimeInZones
         guard let hrTimeInZones = run.hrTimeInZones,
               !hrTimeInZones.isEmpty
@@ -93,7 +115,7 @@ struct RunningEconomyCalculator {
         return weightedSum / totalTime
     }
     
-    private func mechanicsEfficiencyScore(for run: Run) -> Double? {
+    private static func mechanicsEfficiencyScore(for run: Run) -> Double? {
         var penalties: [Double] = []
         
         if let verticalRatio = run.averageVerticalRatio {
@@ -110,13 +132,17 @@ struct RunningEconomyCalculator {
         return 1.0 / avgPenalty
     }
     
-    private func mechanicPenalty(mechanicValue: Double, ideal: Double, maxThreshold: Double) -> Double {
+    private static func mechanicsEfficiencyScore2(for run: Run, baselines: MechanicsBaselines) -> Double {
+        return 0.0
+    }
+    
+    private static func mechanicPenalty(mechanicValue: Double, ideal: Double, maxThreshold: Double) -> Double {
         let diff = max(0, mechanicValue - ideal)
         
         return 1.0 + pow(diff / (maxThreshold - ideal), 2)
     }
     
-    private func powerEfficiencyScore(for run: Run) -> Double? {
+    private static func powerEfficiencyScore(for run: Run) -> Double? {
         var metricScores: [Double] = []
         
         if let stride = run.averageStrideLength {
@@ -138,7 +164,7 @@ struct RunningEconomyCalculator {
         return metricScores.reduce(0, +) / Double(metricScores.count)
     }
     
-    private func terrainEfficiencyScore(for run: Run) -> Double? {
+    private static func terrainEfficiencyScore(for run: Run) -> Double? {
         guard let elevationGain = run.elevationGainMeters,
               let elevationLoss = run.elevationLossMeters,
               let gct = run.averageGroundContactTime,
@@ -156,7 +182,7 @@ struct RunningEconomyCalculator {
         return 0.25 * gainScore + 0.25 * lossScore + 0.25 * gctScore + 0.25 * voScore
     }
     
-    private func normalize(raw: Double, lowerBound: Double, upperBound: Double) -> Double {
+    private static func normalize(raw: Double, lowerBound: Double, upperBound: Double) -> Double {
         guard upperBound > lowerBound else { return 0 }
         
         let clamped = Swift.min(Swift.max(raw, lowerBound), upperBound)

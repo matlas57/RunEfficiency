@@ -18,12 +18,11 @@ class RunDetailViewModel: ObservableObject {
     
     private let runRepository: any RunRepository
     
-    private let runningEconomyCalculator: RunningEconomyCalculator
-    
     var shoeStore: ShoeStore
     var onUpdate: ((Run) -> Void)?
     
-    var economyComponentScores: [Double] = []
+    var baselines: MechanicsBaselines?
+    var economyComponentScores: [ComponentScore] = []
     var cardioScoreString = ""
     var mechanicScoreString = ""
     var powerScoreString = ""
@@ -51,7 +50,7 @@ class RunDetailViewModel: ObservableObject {
         self.runRepository = runRepository
         
         let baselineCalculator = BaselineCalculator(runRepository: runRepository)
-        self.runningEconomyCalculator = RunningEconomyCalculator(baselineCalculator: baselineCalculator)
+        self.baselines = baselineCalculator.computeMechanicsScoreBaselines()
         
         self.shoeStore = shoeStore
         self.onUpdate = onUpdate
@@ -64,8 +63,8 @@ class RunDetailViewModel: ObservableObject {
     }
     
     private func computeEconomyScore() {
-        self.economyScore = runningEconomyCalculator.computeEconomyScore(for: run)
-        self.economyComponentScores = runningEconomyCalculator.computeEconomyScores(for: run)
+        self.economyScore = RunningEconomyCalculator.computeEconomyScore(for: run, baselines: baselines)
+        self.economyComponentScores = RunningEconomyCalculator.computeEconomyScores(for: run, baselines: baselines)
     }
     
     private func setFormattedStrings() {
@@ -83,10 +82,10 @@ class RunDetailViewModel: ObservableObject {
         self.verticalRatioString = RunFormatter.shared.verticalRatioString(run.averageVerticalRatio)
         self.groundContactTimeString = RunFormatter.shared.groundContactTimeString(run.averageGroundContactTime)
         self.effortZoneString = RunFormatter.shared.effortZoneString(run.effortZone)
-        self.cardioScoreString = RunFormatter.shared.economyComponentScoreString(economyComponentScores[0])
-        self.mechanicScoreString = RunFormatter.shared.economyComponentScoreString(economyComponentScores[1])
-        self.powerScoreString = RunFormatter.shared.economyComponentScoreString(economyComponentScores[2])
-        self.terrainScoreString = RunFormatter.shared.economyComponentScoreString(economyComponentScores[3])
+        self.cardioScoreString = RunFormatter.shared.economyComponentScoreString(economyComponentScores[0].score)
+        self.mechanicScoreString = RunFormatter.shared.economyComponentScoreString(economyComponentScores[1].score)
+        self.powerScoreString = RunFormatter.shared.economyComponentScoreString(economyComponentScores[2].score)
+        self.terrainScoreString = RunFormatter.shared.economyComponentScoreString(economyComponentScores[3].score)
     }
     
     func updateShoe(to shoe: Shoe) {
