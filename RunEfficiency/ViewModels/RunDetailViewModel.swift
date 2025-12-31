@@ -64,7 +64,7 @@ class RunDetailViewModel: ObservableObject {
     
     private func computeEconomyScore() {
         self.economyScore = RunningEconomyCalculator.computeEconomyScore(for: run, baselines: baselines)
-        self.economyComponentScores = RunningEconomyCalculator.computeEconomyScores(for: run, baselines: baselines)
+        self.economyComponentScores = RunningEconomyCalculator.computeEconomyScores(for: run, mechanicBaselines: baselines)
     }
     
     private func setFormattedStrings() {

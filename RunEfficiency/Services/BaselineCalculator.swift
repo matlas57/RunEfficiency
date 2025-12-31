@@ -14,8 +14,8 @@ struct MetricBaseline {
 }
 
 struct MechanicsBaselines {
-    let verticalRatioBaseline: MetricBaseline?
-    let groundContactTimeBaseline: MetricBaseline?
+    let verticalRatioBaseline: MetricBaseline
+    let groundContactTimeBaseline: MetricBaseline
 }
 
 final class BaselineCalculator {
@@ -39,13 +39,13 @@ final class BaselineCalculator {
     
     func computeMechanicsScoreBaselines() -> MechanicsBaselines? {
         do {
-            let vrBaseline = try computeBaseline(for: \.averageVerticalRatio)
-            let gctBaseline = try computeBaseline(for: \.averageGroundContactTime)
-            if vrBaseline != nil && gctBaseline != nil {
-                return MechanicsBaselines(
-                    verticalRatioBaseline: vrBaseline,
-                    groundContactTimeBaseline: gctBaseline
-                )
+            if
+                let vrBaseline = try computeBaseline(for: \.averageVerticalRatio),
+                let gctBaseline = try computeBaseline(for: \.averageGroundContactTime) {
+                    return MechanicsBaselines(
+                        verticalRatioBaseline: vrBaseline,
+                        groundContactTimeBaseline: gctBaseline
+                    )
             } else {
                 return nil
             }
@@ -61,7 +61,7 @@ final class BaselineCalculator {
           // Extract valid metric (non nil) values for the specific metric specified in keyPath
           let values = runs.compactMap { $0[keyPath: keyPath] }
           // Ensure there are engough runs to compute a baseline
-          guard values.count > 10 else { return nil }
+          guard values.count >= 10 else { return nil }
 
           // Compute fields of MetricBaseline
           let mean = values.reduce(0, +) / Double(values.count)

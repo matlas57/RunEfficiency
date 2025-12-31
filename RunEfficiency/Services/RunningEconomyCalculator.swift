@@ -12,9 +12,14 @@ struct ComponentScore {
     let usesBaseline: Bool
 }
 
+enum MetricDirection {
+    case lowerBetter
+    case higherBetter
+}
+
 struct RunningEconomyCalculator {
     
-    static func computeEconomyScores(for run: Run, baselines: MechanicsBaselines?) -> [ComponentScore] {
+    static func computeEconomyScores(for run: Run, mechanicBaselines: MechanicsBaselines?) -> [ComponentScore] {
         var componentScores: [ComponentScore] = []
         
         if let cardioScore = cardioEfficiencyScore(for: run), cardioScore > 0 {
@@ -27,15 +32,24 @@ struct RunningEconomyCalculator {
             componentScores.append(ComponentScore(score: 0.0, usesBaseline: false))
         }
         
-        if let mechanicsScore = mechanicsEfficiencyScore(for: run), mechanicsScore > 0 {
-            componentScores.append(
-                ComponentScore(
-                    score: normalize(raw: mechanicsScore, lowerBound: 0.0, upperBound: 1.0),
-                    usesBaseline: false
-                )
-            )
+        if let baselines = mechanicBaselines {
+            if let mechanicScore = mechanicsEfficiencyScore2(for: run, baselines: baselines) {
+                componentScores.append(
+                    ComponentScore(
+                        score: normalize(raw: mechanicScore, lowerBound: 0.0, upperBound: 1.0), usesBaseline: true)
+                    )
+            }
         } else {
-            componentScores.append(ComponentScore(score: 0.0, usesBaseline: false))
+            if let mechanicsScore = mechanicsEfficiencyScore(for: run), mechanicsScore > 0 {
+                componentScores.append(
+                    ComponentScore(
+                        score: normalize(raw: mechanicsScore, lowerBound: 0.0, upperBound: 1.0),
+                        usesBaseline: false
+                    )
+                )
+            } else {
+                componentScores.append(ComponentScore(score: 0.0, usesBaseline: false))
+            }
         }
         
         if let powerScore = powerEfficiencyScore(for: run), powerScore > 0 {
@@ -64,7 +78,7 @@ struct RunningEconomyCalculator {
     }
     
     static func computeEconomyScore(for run: Run, baselines: MechanicsBaselines?) -> Double {
-        let componentScores = computeEconomyScores(for: run, baselines: baselines)
+        let componentScores = computeEconomyScores(for: run, mechanicBaselines: baselines)
         guard !componentScores.isEmpty else { return 0.0 }
         let nonZero = componentScores.count { $0.score != 0.0 }
         return componentScores.reduce(0.0) { $0 + $1.score} / Double(nonZero)
@@ -132,8 +146,42 @@ struct RunningEconomyCalculator {
         return 1.0 / avgPenalty
     }
     
-    private static func mechanicsEfficiencyScore2(for run: Run, baselines: MechanicsBaselines) -> Double {
-        return 0.0
+    private static func mechanicsEfficiencyScore2(for run: Run, baselines: MechanicsBaselines) -> Double? {
+        var scores: [Double] = []
+        
+        let vrScore = computeMechanicScoreWithBaseline(
+            for: run.averageVerticalRatio ?? 0,
+            baseline: baselines.verticalRatioBaseline,
+            direction: .lowerBetter
+        )
+        scores.append(vrScore)
+        
+        let gctScore = computeMechanicScoreWithBaseline(
+            for: run.averageGroundContactTime ?? 0,
+            baseline: baselines.groundContactTimeBaseline,
+            direction: .lowerBetter
+        )
+        scores.append(gctScore)
+        
+        guard !scores.isEmpty else { return nil }
+        
+        let nonZero = scores.count { $0 != 0.0 }
+        return scores.reduce(0.0, +) / Double(nonZero)
+    }
+    
+    private static func computeMechanicScoreWithBaseline(for curMean: Double, baseline: MetricBaseline, direction: MetricDirection, referenceSampleCount: Int = 30) -> Double {
+        
+        guard curMean > 0, baseline.stdDev > 0 else { return 0.0 }
+        
+        let z = (curMean - baseline.mean) / baseline.stdDev
+        let adustedZ = direction == .higherBetter ? z : -z
+        let scale = 2.0
+        let scaledZ = adustedZ / scale
+        
+        let cdf = 0.5 * (1.0 + erf(scaledZ / sqrt(2.0)))
+        
+        return cdf
+        
     }
     
     private static func mechanicPenalty(mechanicValue: Double, ideal: Double, maxThreshold: Double) -> Double {

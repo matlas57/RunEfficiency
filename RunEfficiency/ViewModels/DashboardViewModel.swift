@@ -51,7 +51,7 @@ final class DashboardViewModel: ObservableObject {
             .map { run in
                 RunningEconomyPoint(
                     date: run.date,
-                    efficiencyScore: RunningEconomyCalculator.computeEconomyScore(for: run, baselines: baselines)
+                    efficiencyScore: RunningEconomyCalculator.computeEconomyScore(for: run, baselines: self.baselines)
                 )
             }
             .sorted { $0.date < $1.date }
