@@ -10,11 +10,18 @@ import SwiftUI
 struct ScoreBar: View {
     var scoreName: String
     var score: Double
+    var showBaselineDisclaimer: Bool
     var body: some View {
         GeometryReader { geometry in
             VStack(alignment: .leading, spacing: 0) {
                 Text(scoreName + " Score:")
                     .bold()
+                if showBaselineDisclaimer {
+                    Text("Baseline not yet computed, keep logging runs for a more accurate score")
+                        .lineLimit(nil)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .font(.subheadline)
+                }
                 
                 ZStack(alignment: .leading) {
                     // Background track
@@ -38,7 +45,7 @@ struct ScoreBar: View {
                 }
             }
         }
-        .frame(height: 16)
+        .frame(height: showBaselineDisclaimer ? 58 : 16)
         .padding(.horizontal)
         .padding(.bottom, 65)
     }
@@ -46,10 +53,10 @@ struct ScoreBar: View {
 
 #Preview {
     VStack {
-        ScoreBar(scoreName: "Cardio", score: 100.0)
+        ScoreBar(scoreName: "Cardio", score: 100.0, showBaselineDisclaimer: false)
             .padding(.bottom, 75)
-        ScoreBar(scoreName: "Cardio", score: 50.0)
+        ScoreBar(scoreName: "Mechanics", score: 50.0,showBaselineDisclaimer: true)
             .padding(.bottom, 75)
-        ScoreBar(scoreName: "Cardio", score: 0.0)
+        ScoreBar(scoreName: "Power", score: 0.0, showBaselineDisclaimer: false)
     }
 }

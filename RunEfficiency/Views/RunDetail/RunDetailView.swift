@@ -42,16 +42,30 @@ struct RunDetailView: View {
             Text("Economy Components")
                 .font(.title2)
             VStack {
-                ScoreBar(scoreName: "Cardio", score: viewModel.economyComponentScores[0].score)
+                ScoreBar(
+                    scoreName: "Cardio",
+                    score: viewModel.economyComponentScores[0].score,
+                    showBaselineDisclaimer: false)
                 Divider()
                     .padding(.horizontal)
-                ScoreBar(scoreName: "Mechanics", score: viewModel.economyComponentScores[1].score)
+                ScoreBar(
+                    scoreName: "Mechanics",
+                    score: viewModel.economyComponentScores[1].score,
+                    showBaselineDisclaimer: !viewModel.economyComponentScores[1].usesBaseline)
                 Divider()
                     .padding(.horizontal)
-                ScoreBar(scoreName: "Power", score: viewModel.economyComponentScores[2].score)
+                ScoreBar(
+                    scoreName: "Power",
+                    score: viewModel.economyComponentScores[2].score,
+                    showBaselineDisclaimer: false
+                )
                 Divider()
                     .padding(.horizontal)
-                ScoreBar(scoreName: "Terrain", score: viewModel.economyComponentScores[3].score)
+                ScoreBar(
+                    scoreName: "Terrain",
+                    score:  viewModel.economyComponentScores[3].score,
+                    showBaselineDisclaimer: false
+                )
             }
             .padding(.horizontal)
             .padding(.bottom)

@@ -41,10 +41,14 @@ final class BaselineCalculator {
         do {
             let vrBaseline = try computeBaseline(for: \.averageVerticalRatio)
             let gctBaseline = try computeBaseline(for: \.averageGroundContactTime)
-            return MechanicsBaselines(
-                verticalRatioBaseline: vrBaseline,
-                groundContactTimeBaseline: gctBaseline
-            )
+            if vrBaseline != nil && gctBaseline != nil {
+                return MechanicsBaselines(
+                    verticalRatioBaseline: vrBaseline,
+                    groundContactTimeBaseline: gctBaseline
+                )
+            } else {
+                return nil
+            }
         } catch {
             return nil
         }
