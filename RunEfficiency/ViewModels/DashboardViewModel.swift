@@ -19,16 +19,14 @@ final class DashboardViewModel: ObservableObject {
     private let batchImporter = GarminBatchImporter()
     private let JSONRepo = JSONRunRepository(loader: GarminBatchImporter())
     
-    private let baselineCalculator: BaselineCalculator
     
     init(runRepository: any RunRepository) {
         self.runRepository = runRepository
-        
-        self.baselineCalculator = BaselineCalculator(runRepository: runRepository)
-        
-        computeBaselines()
-
         loadGarminRuns()
+        
+        let baselineCalculator = BaselineCalculator(runRepository: runRepository)
+        self.baselines = baselineCalculator.computeMechanicsScoreBaselines()
+        
         updatePoints()
     }
     
@@ -51,13 +49,9 @@ final class DashboardViewModel: ObservableObject {
             .map { run in
                 RunningEconomyPoint(
                     date: run.date,
-                    efficiencyScore: RunningEconomyCalculator.computeEconomyScore(for: run, baselines: self.baselines)
+                    efficiencyScore: RunningEconomyCalculator.computeEconomyScore(for: run, baselines: baselines)
                 )
             }
             .sorted { $0.date < $1.date }
-    }
-    
-    private func computeBaselines() {
-        baselines = baselineCalculator.computeMechanicsScoreBaselines()
     }
 }
