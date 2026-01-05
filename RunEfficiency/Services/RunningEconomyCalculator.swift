@@ -149,19 +149,23 @@ struct RunningEconomyCalculator {
     private static func mechanicsEfficiencyScore2(for run: Run, baselines: MechanicsBaselines) -> Double? {
         var scores: [Double] = []
         
-        let vrScore = computeMechanicScoreWithBaseline(
-            for: run.averageVerticalRatio ?? 0,
-            baseline: baselines.verticalRatioBaseline,
-            direction: .lowerBetter
-        )
-        scores.append(vrScore)
+        if let vrBaseline = baselines.verticalRatioBaseline {
+            let vrScore = computeMechanicScoreWithBaseline(
+                for: run.averageVerticalRatio ?? 0,
+                baseline: vrBaseline,
+                direction: .lowerBetter
+            )
+            scores.append(vrScore)
+        }
         
-        let gctScore = computeMechanicScoreWithBaseline(
-            for: run.averageGroundContactTime ?? 0,
-            baseline: baselines.groundContactTimeBaseline,
-            direction: .lowerBetter
-        )
-        scores.append(gctScore)
+        if let gctBaseline = baselines.groundContactTimeBaseline {
+            let gctScore = computeMechanicScoreWithBaseline(
+                for: run.averageGroundContactTime ?? 0,
+                baseline: gctBaseline,
+                direction: .lowerBetter
+            )
+            scores.append(gctScore)
+        }
         
         guard !scores.isEmpty else { return nil }
         
@@ -171,17 +175,22 @@ struct RunningEconomyCalculator {
     
     private static func computeMechanicScoreWithBaseline(for curMean: Double, baseline: MetricBaseline, direction: MetricDirection, referenceSampleCount: Int = 30) -> Double {
         
-        guard curMean > 0, baseline.stdDev > 0 else { return 0.0 }
-        
-        let z = (curMean - baseline.mean) / baseline.stdDev
-        let adustedZ = direction == .higherBetter ? z : -z
-        let scale = 2.0
-        let scaledZ = adustedZ / scale
-        
-        let cdf = 0.5 * (1.0 + erf(scaledZ / sqrt(2.0)))
-        
-        return cdf
-        
+        if curMean > 0,
+           let stdDev = baseline.stdDev,
+           let mean = baseline.mean,
+           stdDev > 0 {
+            
+            let z = (curMean - mean) / stdDev
+            let adustedZ = direction == .higherBetter ? z : -z
+            let scale = 2.0
+            let scaledZ = adustedZ / scale
+            
+            let cdf = 0.5 * (1.0 + erf(scaledZ / sqrt(2.0)))
+            
+            return cdf
+        } else {
+            return 0.0
+        }
     }
     
     private static func mechanicPenalty(mechanicValue: Double, ideal: Double, maxThreshold: Double) -> Double {

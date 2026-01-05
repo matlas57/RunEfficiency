@@ -42,18 +42,18 @@ struct RunDetailView: View {
                 .padding(.horizontal)
             Text("Economy Components")
                 .font(.title2)
-            if viewModel.baselines != nil {
-                Text("Baselines")
-                    .font(.title3)
-                if let vrMean = viewModel.baselines?.verticalRatioBaseline.mean,
-                   let vrStdev = viewModel.baselines?.verticalRatioBaseline.stdDev{
-                    Text("VR Mean: \(vrMean), VR Stdev: \(vrStdev)")
-                }
-                if let gctMean = viewModel.baselines?.groundContactTimeBaseline.mean,
-                   let gctStdev = viewModel.baselines?.groundContactTimeBaseline.stdDev{
-                    Text("GCT Mean: \(gctMean), GCT Stdev: \(gctStdev)")
-                }
-            }
+//            if viewModel.baselines != nil {
+//                Text("Baselines")
+//                    .font(.title3)
+//                if let vrMean = viewModel.baselines?.verticalRatioBaseline.mean,
+//                   let vrStdev = viewModel.baselines?.verticalRatioBaseline.stdDev{
+//                    Text("VR Mean: \(vrMean), VR Stdev: \(vrStdev)")
+//                }
+//                if let gctMean = viewModel.baselines?.groundContactTimeBaseline.mean,
+//                   let gctStdev = viewModel.baselines?.groundContactTimeBaseline.stdDev{
+//                    Text("GCT Mean: \(gctMean), GCT Stdev: \(gctStdev)")
+//                }
+//            }
             VStack {
                 ScoreBar(
                     scoreName: "Cardio",

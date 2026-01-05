@@ -22,17 +22,6 @@ struct DashboardView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
-//                    Button("Reset Runs") {
-//                        do {
-//                            try runRepository.deleteAllRuns()
-//                        } catch {
-//                            print("Failed to delete runs:", error)
-//                        }
-//                    }
-                    
-//                    if let coreDataRuns = try? runRepository.fetchAllRuns() {
-//                        Text("Core Data Runs: \(coreDataRuns.count)")
-//                    }
                     
                     TrendView(points: viewModel.points)
                     RunsListView(runs: viewModel.runs)

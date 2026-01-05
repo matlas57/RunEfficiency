@@ -8,15 +8,22 @@
 import Foundation
 
 struct MetricBaseline {
-    let mean: Double
-    let stdDev: Double
+    let mean: Double?
+    let stdDev: Double?
     let sampleCount: Int
 }
 
 struct MechanicsBaselines {
-    let verticalRatioBaseline: MetricBaseline
-    let groundContactTimeBaseline: MetricBaseline
+    let verticalRatioBaseline: MetricBaseline?
+    let groundContactTimeBaseline: MetricBaseline?
+    let sampleCount: Int
 }
+
+enum BaselineState {
+    case insufficientSamples(minRequired: Int, actual: Int)
+    case established
+}
+
 
 final class BaselineCalculator {
     private let runRepository: any RunRepository
@@ -42,9 +49,11 @@ final class BaselineCalculator {
             if
                 let vrBaseline = try computeBaseline(for: \.averageVerticalRatio),
                 let gctBaseline = try computeBaseline(for: \.averageGroundContactTime) {
+                    let sampleCount = min(vrBaseline.sampleCount, gctBaseline.sampleCount)
                     return MechanicsBaselines(
                         verticalRatioBaseline: vrBaseline,
-                        groundContactTimeBaseline: gctBaseline
+                        groundContactTimeBaseline: gctBaseline,
+                        sampleCount: sampleCount
                     )
             } else {
                 return nil
@@ -75,4 +84,48 @@ final class BaselineCalculator {
 
           return MetricBaseline(mean: mean, stdDev: stdDev, sampleCount: values.count)
       }
+    
+    static func computeMechanicsScoreBaselines(from runs: [Run], minSampleCount: Int = 10) -> (baselines: MechanicsBaselines?, state: BaselineState) {
+        let vrBaseline = computeBaseline(runs: runs, keyPath: \.averageVerticalRatio, minSampleCount: minSampleCount)
+        let gctBaseline = computeBaseline(runs: runs, keyPath: \.averageGroundContactTime, minSampleCount: minSampleCount)
+        let sampleCount = min(vrBaseline.sampleCount, gctBaseline.sampleCount)
+        
+        if sampleCount < minSampleCount {
+            return (
+                baselines: nil, 
+                state: .insufficientSamples(minRequired: minSampleCount, actual: sampleCount)
+            )
+        } else {
+            return (
+                baselines: MechanicsBaselines(
+                    verticalRatioBaseline: vrBaseline,
+                    groundContactTimeBaseline: gctBaseline,
+                    sampleCount: sampleCount
+                ),
+                state: .established
+            )
+        }
+    }
+    
+    static func computeBaseline(runs: [Run], keyPath: KeyPath<Run, Double?>, minSampleCount: Int) -> MetricBaseline {
+        
+        let values = runs.compactMap { $0[keyPath: keyPath] }
+        
+        guard values.count >= minSampleCount else {
+            return MetricBaseline (mean: nil, stdDev: nil, sampleCount: values.count)
+        }
+        
+        let mean = values.reduce(0, +) / Double(values.count)
+        
+        let variance = values.reduce(0) { partialResult, value in
+            let diff = value - mean
+            return partialResult + diff * diff
+        } / Double(values.count)
+
+        let stdDev = sqrt(variance)
+
+        return MetricBaseline(mean: mean, stdDev: stdDev, sampleCount: values.count)
+    }
+    
+    
 }
