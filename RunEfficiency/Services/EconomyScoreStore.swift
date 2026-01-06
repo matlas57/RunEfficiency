@@ -14,12 +14,14 @@ import Combine
 final class EconomyScoreStore: ObservableObject {
     @Published private(set) var scores: [UUID: RunningEconomyScore] = [:]
     @Published private(set) var baselineState: BaselineState?
+    @Published private(set) var baselines: MechanicsBaselines?
     
     func recompute(with runs: [Run]) {
         //try to compute baseline
         let minSampleCount = 10
         let (mechanicsBaselines, baselineState) = BaselineCalculator.computeMechanicsScoreBaselines(from: runs, minSampleCount: minSampleCount)
         self.baselineState = baselineState
+        self.baselines = mechanicsBaselines
         
         var newScores: [UUID: RunningEconomyScore] = [:]
 
@@ -62,7 +64,25 @@ final class EconomyScoreStore: ObservableObject {
     }
     
     func score(for run: Run) -> RunningEconomyScore? {
-        return nil
+        scores[run.id]
+    }
+    
+    func economyPoints(for runs: [Run]) -> [RunningEconomyPoint] {
+        runs.compactMap { run -> RunningEconomyPoint? in
+            guard let score = scores[run.id]?.overallScore else {
+                return nil
+            }
+
+            return RunningEconomyPoint(
+                date: run.date,
+                economyScore: score
+            )
+        }
+        .sorted { $0.date < $1.date }
+    }
+    
+    var mechanicsBaselines: MechanicsBaselines? {
+        baselines
     }
     
     enum EconomyComponentIndex: Int {

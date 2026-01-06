@@ -11,6 +11,20 @@ import CoreData
 @main
 struct RunningEconomyApp: App {
     let persistenceController = PersistenceController.shared
+    let appDataController: AppDataController
+    
+    init() {
+        let runRepository = CoreDataRunRepository(
+            context: persistenceController.container.viewContext
+        )
+
+        let economyScoreStore = EconomyScoreStore()
+
+        self.appDataController = AppDataController(
+            runRepository: runRepository,
+            economyScoreStore: economyScoreStore
+        )
+    }
 
     var body: some Scene {
         WindowGroup {
@@ -19,6 +33,7 @@ struct RunningEconomyApp: App {
                     \.managedObjectContext,
                     persistenceController.container.viewContext
                 )
+                .environmentObject(appDataController)
         }
     }
 }

@@ -42,18 +42,6 @@ struct RunDetailView: View {
                 .padding(.horizontal)
             Text("Economy Components")
                 .font(.title2)
-//            if viewModel.baselines != nil {
-//                Text("Baselines")
-//                    .font(.title3)
-//                if let vrMean = viewModel.baselines?.verticalRatioBaseline.mean,
-//                   let vrStdev = viewModel.baselines?.verticalRatioBaseline.stdDev{
-//                    Text("VR Mean: \(vrMean), VR Stdev: \(vrStdev)")
-//                }
-//                if let gctMean = viewModel.baselines?.groundContactTimeBaseline.mean,
-//                   let gctStdev = viewModel.baselines?.groundContactTimeBaseline.stdDev{
-//                    Text("GCT Mean: \(gctMean), GCT Stdev: \(gctStdev)")
-//                }
-//            }
             VStack {
                 ScoreBar(
                     scoreName: "Cardio",
@@ -133,12 +121,37 @@ struct RunDetailView: View {
 }
 
 #Preview {
+    let previewController: AppDataController = {
+        // 1. Load runs from JSON
+        let jsonRepo = JSONRunRepository(loader: GarminBatchImporter())
+        let sampleRuns: [Run]
+        do {
+            sampleRuns = try jsonRepo.fetchAllRuns().sorted { $0.date > $1.date }
+        } catch {
+            sampleRuns = []
+            print("Failed to load JSON preview runs:", error)
+        }
+
+        // 2. Initialize controller
+        let controller = AppDataController(
+            runRepository: CoreDataRunRepository(
+                context: PersistenceController.preview.container.viewContext
+            ),
+            economyScoreStore: EconomyScoreStore()
+        )
+
+        // 3. Save runs and recompute
+        controller.savePreviewRuns(sampleRuns)
+
+        return controller
+    }()
+    
     let sampleRun: Run = {
-    guard let url = Bundle.main.url(forResource: "activity_21263083277", withExtension: "json"),
-          let data = try? Data(contentsOf: url),
-          let run = try? GarminActivityImporter().importRun(from: data) else {
-            // fallback dummy run if import fails
-            return Run(
+        let run: Run
+        do {
+            run = try previewController.fetchRuns().first!
+        } catch {
+            run = Run(
                 id: UUID(),
                 externalActivityId: 0,
                 date: Date(),
@@ -152,14 +165,12 @@ struct RunDetailView: View {
                 averageStrideLength: 1.2,
                 hrTimeInZones: nil
             )
+            print("Failed to load sample run, using default", error)
         }
         return run
     }()
     
-    let profile = UserProfile(unitPreference: .metric)
-
-    // Create the viewmodel
-    let viewModel = RunDetailViewModel(run: sampleRun, userProfile: profile, runRepository: CoreDataRunRepository(context: PersistenceController.shared.container.viewContext), shoeStore: ShoeStore())
+    let viewModel = RunDetailViewModel(run: sampleRun, userProfile: UserProfile(), appDataController: previewController, shoeStore: ShoeStore())
     
     RunDetailView(viewModel: viewModel, run: .constant(sampleRun))
         .environmentObject(ShoeStore())

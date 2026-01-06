@@ -16,7 +16,7 @@ class RunDetailViewModel: ObservableObject {
     @Published private(set) var economyScore = 0.0
     @Published var selectedShoe: Shoe?
     
-    private let runRepository: any RunRepository
+    private let appDataController: AppDataController
     
     var shoeStore: ShoeStore
     var onUpdate: ((Run) -> Void)?
@@ -43,28 +43,32 @@ class RunDetailViewModel: ObservableObject {
     var groundContactTimeString = ""
     var effortZoneString = ""
     
-    init(run: Run, userProfile: UserProfile, runRepository: any RunRepository, shoeStore: ShoeStore, onUpdate: ((Run) -> Void)? = nil) {
+    init(run: Run, userProfile: UserProfile, appDataController: AppDataController, shoeStore: ShoeStore, onUpdate: ((Run) -> Void)? = nil) {
         self.run = run
         self.userProfile = userProfile
         self.selectedShoe = shoeStore.getShoe(for: run.shoeId)
-        self.runRepository = runRepository
-        
-        let baselineCalculator = BaselineCalculator(runRepository: runRepository)
-        self.baselines = baselineCalculator.computeMechanicsScoreBaselines()
-        
+        self.appDataController = appDataController
         self.shoeStore = shoeStore
         self.onUpdate = onUpdate
+        
+        self.baselines = appDataController.economyScoreStore.mechanicsBaselines
+        
         recomputeAll()
-        setFormattedStrings()
     }
     
     private func recomputeAll() {
         computeEconomyScore()
+        setFormattedStrings()
     }
     
     private func computeEconomyScore() {
-        self.economyScore = RunningEconomyCalculator.computeEconomyScore(for: run, baselines: baselines)
-        self.economyComponentScores = RunningEconomyCalculator.computeEconomyScores(for: run, mechanicBaselines: baselines)
+        self.economyScore = appDataController.economyScoreStore.score(for: run)?.overallScore ?? 0.0
+        self.economyComponentScores = [
+            appDataController.economyScoreStore.score(for: run)?.cardioScore ?? ComponentScore(score: 0, usesBaseline: false),
+            appDataController.economyScoreStore.score(for: run)?.mechanicsScore ?? ComponentScore(score: 0, usesBaseline: false),
+            appDataController.economyScoreStore.score(for: run)?.powerScore ?? ComponentScore(score: 0, usesBaseline: false),
+            appDataController.economyScoreStore.score(for: run)?.terrainScore ?? ComponentScore(score: 0, usesBaseline: false)
+        ]
     }
     
     private func setFormattedStrings() {

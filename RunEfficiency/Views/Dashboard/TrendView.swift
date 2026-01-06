@@ -20,12 +20,12 @@ struct TrendView: View {
                 ForEach(points) { point in
                     LineMark(
                         x: .value("Date", point.date),
-                        y: .value("Economy Score", point.efficiencyScore)
+                        y: .value("Economy Score", point.economyScore)
                     )
                     .lineStyle(StrokeStyle(lineWidth: 2, lineCap: .round))
                     PointMark(
                         x: .value("Date", point.date),
-                        y: .value("Economy Score", point.efficiencyScore)
+                        y: .value("Economy Score", point.economyScore)
                     )
                     .symbolSize(25)
                 }

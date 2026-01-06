@@ -10,48 +10,34 @@ import Combine
 import CoreData
 
 final class DashboardViewModel: ObservableObject {
-    @Published var runs: [Run] = []
     //private(set) means the property can be read publically but only written inside this type. Guarantees that updatePoints is the only way points is modified
+    @Published private(set) var runs: [Run] = []
     @Published private(set) var points: [RunningEconomyPoint] = []
     @Published private(set) var baselines: MechanicsBaselines?
     
-    private let runRepository: any RunRepository
-    private let batchImporter = GarminBatchImporter()
-    private let JSONRepo = JSONRunRepository(loader: GarminBatchImporter())
+    private let appDataController: AppDataController
     
-    
-    init(runRepository: any RunRepository) {
-        self.runRepository = runRepository
-        loadGarminRuns()
-        
-        let baselineCalculator = BaselineCalculator(runRepository: runRepository)
-        self.baselines = baselineCalculator.computeMechanicsScoreBaselines()
-        
+    init(appDataController: AppDataController) {
+        self.appDataController = appDataController
+
+        // 1. Read persisted runs
+        do {
+            self.runs = try appDataController.fetchRuns()
+                .sorted { $0.date > $1.date }
+        } catch {
+            self.runs = []
+        }
+
+        // 2. Read baselines (already computed during bootstrap)
+        self.baselines = appDataController.economyScoreStore.mechanicsBaselines
+
+        // 3. Derive points from existing data
         updatePoints()
     }
     
-    //This will change once data is pulled directly from GarminDB
-    private func loadGarminRuns() {
-        do {
-            let importedRuns = try JSONRepo.fetchAllRuns()
-            self.runs = importedRuns.sorted { $0.date > $1.date }
-            for run in runs {
-                try runRepository.save(run: run)
-            }
-        } catch {
-            print("Failed to import Garmin runs:", error)
-        }
-    }
     
     // update points in a function called on init to avoid recomputing points on every refresh
     private func updatePoints() {
-        points = runs
-            .map { run in
-                RunningEconomyPoint(
-                    date: run.date,
-                    efficiencyScore: RunningEconomyCalculator.computeEconomyScore(for: run, baselines: baselines)
-                )
-            }
-            .sorted { $0.date < $1.date }
+        points = appDataController.economyScoreStore.economyPoints(for: runs)
     }
 }
